@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Storage Protocol Bar --- */
+    .instruction-bar {
+        background: var(--surface-bento);
+        border: 1px solid var(--border-bento);
+        border-radius: 20px;
+        padding: 18px 25px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .inst-item { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+    .inst-item i { color: var(--primary, #3b82f6); font-size: 0.95rem; }
+
+    /* --- Data Table Bento --- */
+    .data-table-bento {
+        background: var(--surface-bento); border-radius: 28px; border: 1px solid var(--border-bento);
+        box-shadow: var(--card-shadow); overflow: hidden;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* ========================================= */
+    /* --- BOOTSTRAP TABLE BACKGROUND FIX --- */
+    /* ========================================= */
+    .table,
+    .table > tbody,
+    .table > tbody > tr,
+    .table > tbody > tr > td,
+    .table > thead > tr > th {
+        background-color: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-striped-bg: transparent !important;
+    }
+
+    /* Table Design */
+    .table thead th {
+        color: var(--text-tertiary); font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 1px; padding: 18px 25px; border-bottom: 1px solid var(--border-bento); font-weight: 800;
+        background: rgba(0,0,0,0.02) !important;
+    }
+    .table tbody td { padding: 18px 25px; vertical-align: middle; border-bottom: 1px solid var(--border-bento); color: var(--text-primary); font-size: 0.95rem; }
+    .table tbody tr { transition: background-color 0.25s ease; }
+    .table tbody tr:hover { background-color: var(--row-hover-bg) !important; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* Archive UI Elements */
+    .archive-tag {
+        font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 0.82rem;
+        background: var(--input-bg); color: var(--primary, #3b82f6); padding: 5px 12px;
+        border-radius: 8px; border: 1px solid var(--border-bento);
+    }
+
+    /* Soft UI Vaulted Pill */
+    .v2-status-pill {
+        background: rgba(99, 102, 241, 0.12); color: #6366f1;
+        padding: 6px 14px; border-radius: 8px; font-size: 0.72rem;
+        font-weight: 800; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;
+    }
+    body.dark-mode .v2-status-pill {
+        background: rgba(129, 140, 248, 0.15); color: #818cf8;
+    }
+
+    .date-pill-v2 {
+        background: var(--input-bg); border: 1px solid var(--border-bento);
+        padding: 6px 14px; border-radius: 10px; font-weight: 800; color: var(--text-primary);
+        display: inline-flex; align-items: center; gap: 8px; font-size: 0.82rem;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Action Buttons V2 */
+    .btn-backup-v2 {
+        border-radius: 14px; padding: 0 20px; height: 44px; font-weight: 800;
+        font-size: 0.85rem; transition: all 0.2s ease; border: none; display: inline-flex;
+        align-items: center; gap: 10px; color: white !important;
+    }
+    .btn-backup-v2:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    .btn-backup-v2:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* Alert Bento Warning */
+    .alert-bento {
+        background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 24px; padding: 20px; margin-bottom: 30px;
+        display: flex; align-items: center; gap: 20px;
+    }
+
+    .btn-page-v2 {
+        width: 38px; height: 38px; border-radius: 12px; display: inline-flex; align-items: center;
+        justify-content: center; transition: all 0.2s ease; border: 1px solid var(--border-bento);
+        background: var(--surface-bento); color: var(--text-primary); text-decoration: none;
+    }
+    .btn-page-v2:hover:not(.disabled) { border-color: var(--primary, #3b82f6); color: var(--primary, #3b82f6); }
+
+    .icon-box.c-red {
+        background: rgba(239, 68, 68, 0.12) !important;
+        color: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* ========================================= */
+    /* --- BROWSER DROPDOWN VISIBILITY FIX --- */
+    /* ========================================= */
+    select option {
+        background-color: var(--surface-bento) !important;
+        color: var(--text-primary) !important;
+    }
+</style>
+
+<!-- Header -->
+<div class="mb-4 mt-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">System Administration</li>
+            <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">Archives</li>
+        </ol>
+    </nav>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <h2 class="page-title m-0">Storage & Backup Center</h2>
+
+        {% if session['user_role'] in ['Admin', 'Super Admin', 'it support'] %}
+        <div class="d-flex gap-2">
+            <form method="POST" onsubmit="return confirm('Backup ALL resolved tickets to local vault?');">
+                <input type="hidden" name="action" value="backup_tickets">
+                <button type="submit" class="btn-backup-v2 shadow-sm" style="background: linear-gradient(135deg, #f59e0b, #d97706);" {% if not has_archive %}disabled{% endif %}>
+                    <i class="fa-solid fa-database"></i> Backup Tickets
+                </button>
+            </form>
+            <form method="POST" onsubmit="return confirm('Vault ALL verified IER forms?');">
+                <input type="hidden" name="action" value="backup_iers">
+                <button type="submit" class="btn-backup-v2 shadow-sm" style="background: linear-gradient(135deg, #0ea5e9, #2563eb);" {% if not has_archive %}disabled{% endif %}>
+                    <i class="fa-solid fa-file-shield"></i> Vault Forms
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Storage Protocol Bar -->
+<div class="instruction-bar shadow-sm">
+    <div class="inst-item"><i class="fa-solid fa-vault"></i><span>Immutable Storage</span></div>
+    <div class="inst-item"><i class="fa-solid fa-fingerprint"></i><span>Data Integrity</span></div>
+    <div class="inst-item"><i class="fa-solid fa-clock-rotate-left"></i><span>Point-in-time Recovery</span></div>
+</div>
+
+<!-- CONNECTION WARNING BENTO -->
+{% if not has_archive %}
+<div class="alert-bento fade-in">
+    <div class="icon-box c-red" style="width: 50px; height: 50px; border-radius: 14px; font-size: 1.3rem;">
+        <i class="fa-solid fa-plug-circle-xmark"></i>
+    </div>
+    <div>
+        <h6 class="fw-900 m-0 text-danger" style="letter-spacing: -0.5px;">Secondary Database Offline</h6>
+        <p class="small fw-bold m-0" style="color: var(--text-secondary);">The local archive node is unreachable. Backup operations are temporarily locked.</p>
+    </div>
+</div>
+{% endif %}
+
+<!-- ARCHIVE DATA TABLE -->
+<div class="data-table-bento mb-4">
+    <div class="table-responsive">
+        <table class="table table-borderless align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-4" style="width: 160px;">Vault ID</th>
+                    <th>Requester Identity</th>
+                    <th>Topic Description</th>
+                    <th>Node Status</th>
+                    <th class="text-end pe-4">Vaulted Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in archived %}
+                <tr>
+                    <td class="ps-4"><span class="archive-tag">#{{ a.ticket_id }}</span></td>
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-sm" style="width: 34px; height: 34px; background: var(--avatar-bg); color: var(--avatar-text); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; flex-shrink: 0;">
+                                {{ a.employee_name[0] | upper }}
+                            </div>
+                            <div class="fw-800" style="font-size: 0.95rem; color: var(--text-primary);">{{ a.employee_name }}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-bold text-truncate" style="max-width: 280px; color: var(--text-secondary);">{{ a.subject }}</div>
+                    </td>
+                    <td><span class="v2-status-pill"><i class="fa-solid fa-box-archive"></i> Vaulted</span></td>
+                    <td class="text-end pe-4">
+                        <div class="date-pill-v2">
+                            <i class="fa-regular fa-calendar-check text-primary small"></i>
+                            <span>{{ a.archived_at.strftime('%b %d, %Y') }}</span>
+                            <span class="opacity-40 small fw-normal">{{ a.archived_at.strftime('%H:%M') }}</span>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <div class="py-5" style="color: var(--text-tertiary);">
+                            <i class="fa-solid fa-box-open fa-4x mb-3 opacity-50"></i>
+                            <h5 class="fw-900" style="color: var(--text-primary);">No Vaulted Data Detectable</h5>
+                            <p class="small fw-bold">Records populate here after a successful archive commit.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- V2 PAGINATION -->
+{% if pagination and pagination.pages > 1 %}
+<div class="d-flex justify-content-center align-items-center gap-2 mt-4 mb-5">
+    <a href="{{ url_for('archive', page=pagination.prev_num) }}"
+       class="btn-page-v2 ajax-link {% if not pagination.has_prev %}disabled opacity-25{% endif %}">
+        <i class="fa-solid fa-chevron-left"></i>
+    </a>
+
+    <div class="px-3 py-2 fw-800 small shadow-sm" style="background: var(--surface-bento); border: 1px solid var(--border-bento); border-radius: 12px; color: var(--text-primary);">
+        Page {{ pagination.page }} <span class="mx-1" style="color: var(--text-tertiary); font-weight: normal;">/</span> {{ pagination.pages }}
+    </div>
+
+    <a href="{{ url_for('archive', page=pagination.next_num) }}"
+       class="btn-page-v2 ajax-link {% if not pagination.has_next %}disabled opacity-25{% endif %}">
+        <i class="fa-solid fa-chevron-right"></i>
+    </a>
+</div>
+{% endif %}
+
+<script>
+    (function() {
+        // V2 logic for Archive retrieval
+    })();
+</script>
+{% endblock %}

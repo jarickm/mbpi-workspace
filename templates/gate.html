@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Access Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #002e5d; /* A deep corporate blue */
+            --accent: #0d6efd; /* A brighter blue for interaction */
+            --danger: #d71921; /* Red for alerts */
+            --glass: rgba(255, 255, 255, 0.6);
+            --card-border: rgba(255, 255, 255, 0.7);
+        }
+
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+            background-color: #f0f4f8; /* Soft background color */
+        }
+
+        /* Animated Mesh Background */
+        /* Animated Mesh Background - Optimized */
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+        }
+
+        .wrapper {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* The Main Card - Optimized */
+        .access-card {
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 32px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        /* Left Visual Panel */
+        .visual-side {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary) 0%, #001a35 100%);
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visual-side::after { /* Subtle texture overlay */
+            content: "";
+            position: absolute;
+            width: 200%; height: 200%;
+            background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            opacity: 0.08;
+            top: 0; left: 0;
+            z-index: 0;
+        }
+        .visual-side > * { z-index: 1; } /* Ensure content is above texture */
+
+        .status-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .status-tag .dot {
+            width: 8px; height: 8px;
+            background: #4ade80; /* Green for operational */
+            border-radius: 50%;
+            box-shadow: 0 0 10px #4ade80;
+        }
+
+        /* Right Form Panel */
+        .form-side {
+            flex: 1.1;
+            padding: 50px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .form-side h2 {
+            font-weight: 700;
+            font-size: 1.75rem;
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+
+        .form-side p {
+            color: #64748b;
+            margin-bottom: 40px;
+        }
+
+        /* Passcode Input Styling */
+        .form-control-passcode {
+            height: 64px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            color: #1e293b;
+            text-align: center;
+            letter-spacing: 8px;
+            font-size: 2rem;
+            font-weight: 700;
+            border-radius: 16px;
+            padding-left: 15px; /* Offset for letter spacing */
+            transition: 0.3s ease;
+        }
+
+        .form-control-passcode:focus {
+            background: white;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.1);
+        }
+
+        /* The Button */
+        .btn-authorize {
+            height: 56px;
+            background: var(--primary);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-weight: 700;
+            width: 100%;
+            transition: 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 46, 93, 0.15);
+        }
+
+        .btn-authorize:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(13, 110, 253, 0.2);
+            color: white;
+        }
+
+        /* Security Feature List on Left Side */
+        .feature-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .feature-icon {
+            width: 40px; height: 40px; flex-shrink: 0;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        /* Toast UI for alerts */
+        .toast-container {
+            position: fixed;
+            top: 30px; right: 30px; z-index: 1000;
+        }
+        .modern-toast {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-left: 6px solid var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .visual-side { display: none; }
+            .access-card {
+                max-width: 450px;
+                height: auto;
+                flex-direction: column;
+            }
+            .form-side { padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mesh-bg"></div>
+
+    <!-- Alert System using Modern Toasts -->
+    <div class="toast-container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="modern-toast">
+                    <div class="text-danger"><i class="fas fa-shield-halved fa-2x"></i></div>
+                    <div>
+                        <div class="fw-bold">Access Denied</div>
+                        <div class="small text-muted">{{ messages[0] }}</div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="wrapper">
+        <div class="access-card">
+
+            <!-- Visual Left Section -->
+            <div class="visual-side">
+                <div>
+                    <div class="status-tag">
+                        <span class="dot"></span> SECURE CONNECTION
+                    </div>
+                    <h1 class="mt-4 fw-800" style="font-size: 2.8rem; line-height: 1.1;">
+                        Secure<br>Gateway
+                    </h1>
+                    <p class="opacity-75 mt-3">This area contains confidential information. Authorization is required.</p>
+                </div>
+
+                <div class="features">
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-shield-halved"></i></div>
+                        <div>
+                            <div class="fw-bold">Encrypted Connection</div>
+                            <div class="small opacity-50">All data is secured with TLS 1.3.</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-fingerprint"></i></div>
+                        <div>
+                            <div class="fw-bold">Access Logging</div>
+                            <div class="small opacity-50">All attempts are logged for security audits.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="small opacity-50">
+                    &copy; 2024 Your Company Name
+                </div>
+            </div>
+
+            <!-- Form Right Section -->
+            <div class="form-side">
+                <h2>Authorization Required</h2>
+                <p>Enter your assigned passcode to proceed.</p>
+
+                <form method="POST">
+                    <input type="password" name="passcode" class="form-control form-control-passcode mb-4" autofocus required maxlength="6" oninput="this.value=this.value.toUpperCase()">
+                    <button type="submit" class="btn btn-authorize fw-bold">AUTHORIZE</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-remove toasts after 5 seconds for a better user experience
+        setTimeout(() => {
+            const toasts = document.querySelectorAll('.modern-toast');
+            toasts.forEach(toast => {
+                toast.style.transition = "0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55)";
+                toast.style.opacity = "0";
+                toast.style.transform = "translateX(50px) scale(0.9)";
+                setTimeout(() => toast.remove(), 800);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

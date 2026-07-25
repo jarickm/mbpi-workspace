@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Unified Data Table --- */
+    .data-table-bento {
+        background: var(--surface-bento); border-radius: 28px; padding: 0;
+        border: 1px solid var(--border-bento); box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* ========================================= */
+    /* --- BOOTSTRAP TABLE BACKGROUND FIX --- */
+    /* ========================================= */
+    .table,
+    .table > tbody,
+    .table > tbody > tr,
+    .table > tbody > tr > td,
+    .table > thead > tr > th {
+        background-color: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-striped-bg: transparent !important;
+    }
+
+    /* Table Design */
+    .table thead th {
+        color: var(--text-tertiary); font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 1px; padding: 18px 25px; border-bottom: 1px solid var(--border-bento); font-weight: 800;
+        background: rgba(0,0,0,0.02) !important;
+    }
+    .table tbody td { padding: 18px 25px; vertical-align: middle; border-bottom: 1px solid var(--border-bento); color: var(--text-primary); font-size: 0.95rem; }
+    .table tbody tr { transition: background-color 0.25s ease; }
+    .table tbody tr:hover { background-color: var(--row-hover-bg) !important; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* --- Priority Badges (Vibrant Soft UI) --- */
+    .badge-priority { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; padding: 6px 12px; border-radius: 8px; letter-spacing: 0.5px; display: inline-block; }
+    .priority-urgent { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .priority-high { background: rgba(249, 115, 22, 0.15); color: #ea580c; border: 1px solid rgba(249, 115, 22, 0.2); }
+    .priority-medium { background: rgba(234, 179, 8, 0.15); color: #ca8a04; border: 1px solid rgba(234, 179, 8, 0.2); }
+    .priority-low { background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.2); }
+
+    body.dark-mode .priority-urgent { color: #f87171; border-color: rgba(248, 113, 113, 0.25); }
+    body.dark-mode .priority-high { color: #fb923c; border-color: rgba(251, 146, 60, 0.25); }
+    body.dark-mode .priority-medium { color: #facc15; border-color: rgba(250, 204, 21, 0.25); }
+    body.dark-mode .priority-low { color: #34d399; border-color: rgba(52, 211, 153, 0.25); }
+
+    /* --- Timer Pill --- */
+    .timer-pill {
+        background: var(--input-bg); color: var(--text-primary); border: 1px solid var(--border-bento);
+        padding: 6px 14px; border-radius: 10px; font-weight: 800; font-size: 0.85rem;
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .timer-pill i { color: var(--primary, #3b82f6); }
+
+    /* --- Colorful Type Icons --- */
+    .type-icon-box { width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+    .bg-incident { background: rgba(14, 165, 233, 0.15); color: #0ea5e9; }
+    .bg-request { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+    .bg-problem { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .bg-change { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+    /* Action Buttons */
+    .btn-delete-icon {
+        width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center;
+        border-radius: 10px; transition: all 0.2s ease; background: var(--input-bg);
+        color: #ef4444; border: 1px solid var(--border-bento); padding: 0;
+    }
+    .btn-delete-icon:hover { background: #ef4444; color: white !important; transform: scale(1.05); }
+
+    /* --- Sidebar Configuration Form --- */
+    .sticky-form-card {
+        background: var(--surface-bento); border-radius: 28px; padding: 30px;
+        border: 1px solid var(--border-bento); box-shadow: var(--card-shadow);
+        position: sticky; top: 20px;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .form-header-icon { width: 48px; height: 48px; background: rgba(99, 102, 241, 0.12); color: #6366f1; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+
+    .input-label { font-size: 0.75rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+
+    .form-control-custom, .form-select-custom {
+        background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 14px;
+        padding: 12px 18px; font-weight: 600; transition: all 0.2s; font-size: 0.95rem; color: var(--text-primary);
+    }
+    .form-control-custom:focus, .form-select-custom:focus { background: var(--surface-bento); border-color: var(--primary, #3b82f6); outline: none; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+
+    .btn-save-sla {
+        background: var(--primary, #3b82f6); color: white !important; border: none; border-radius: 16px;
+        padding: 16px; font-weight: 800; font-size: 1rem; transition: all 0.2s ease;
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-save-sla:hover { transform: translateY(-2px); background: #1d4ed8; }
+
+    .tip-box {
+        background: rgba(59, 130, 246, 0.08); border-left: 4px solid var(--primary, #3b82f6) !important;
+        border-radius: 12px; padding: 18px; margin-bottom: 25px;
+    }
+
+    /* ========================================= */
+    /* --- BROWSER DROPDOWN VISIBILITY FIX --- */
+    /* ========================================= */
+    select option {
+        background-color: var(--surface-bento) !important;
+        color: var(--text-primary) !important;
+    }
+</style>
+
+<div class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">Management</li>
+            <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">SLA Policies</li>
+        </ol>
+    </nav>
+    <h2 class="page-title m-0">Service Level Agreements</h2>
+</div>
+
+<div class="row g-4">
+    <!-- SLA POLICIES LIST BENTO -->
+    <div class="col-lg-7">
+        <div class="data-table-bento">
+            <div class="table-responsive">
+                <table class="table table-borderless align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Ticket Category</th>
+                            <th>Priority</th>
+                            <th>Target Resolution</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in policies %}
+                        <tr>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="type-icon-box
+                                        {% if p.ticket_type == 'Incident' %}bg-incident
+                                        {% elif p.ticket_type == 'Request' %}bg-request
+                                        {% elif p.ticket_type == 'Problem' %}bg-problem
+                                        {% else %}bg-change{% endif %}">
+                                        <i class="fa-solid
+                                            {% if p.ticket_type == 'Incident' %}fa-bolt
+                                            {% elif p.ticket_type == 'Request' %}fa-plus-circle
+                                            {% elif p.ticket_type == 'Problem' %}fa-circle-exclamation
+                                            {% else %}fa-code-merge{% endif %}">
+                                        </i>
+                                    </div>
+                                    <div class="fw-800" style="color: var(--text-primary);">{{ p.ticket_type }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge-priority
+                                    {% if p.priority == 'Urgent' %}priority-urgent
+                                    {% elif p.priority == 'High' %}priority-high
+                                    {% elif p.priority == 'Medium' %}priority-medium
+                                    {% else %}priority-low{% endif %}">
+                                    {{ p.priority }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="timer-pill">
+                                    <i class="fa-solid fa-stopwatch"></i>
+                                    <span>{{ p.resolve_in_hours }} Hours</span>
+                                    <span class="small fw-normal" style="color: var(--text-tertiary);">({% if p.resolve_in_hours >= 24 %}{{ (p.resolve_in_hours / 24)|round(1) }}d{% else %}Day{% endif %})</span>
+                                </div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <form method="POST" onsubmit="return confirm('Delete this SLA rule? Tickets will fallback to default times.');" class="d-inline">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="{{ p.id }}">
+                                    <button type="submit" class="btn btn-delete-icon" title="Remove SLA"><i class="fa-solid fa-trash-can"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <i class="fa-solid fa-clock-rotate-left fa-3x mb-3 opacity-25" style="color: var(--text-tertiary);"></i>
+                                <h5 class="fw-800" style="color: var(--text-primary);">No SLA Policies Defined</h5>
+                                <p class="small" style="color: var(--text-secondary);">System is currently using hardcoded default fallbacks.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD/EDIT SLA BENTO -->
+    <div class="col-lg-5">
+        <div class="sticky-form-card">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="form-header-icon"><i class="fa-solid fa-stopwatch-20"></i></div>
+                <div>
+                    <h5 class="fw-800 m-0" style="color: var(--text-primary);">Configure Rule</h5>
+                    <div class="small fw-bold" style="color: var(--text-secondary);">Set resolution deadlines</div>
+                </div>
+            </div>
+
+            <!-- Modern Alert Tip -->
+            <div class="tip-box">
+                <div class="small fw-bold d-flex gap-2" style="color: var(--text-secondary);">
+                    <i class="fa-solid fa-circle-info mt-1" style="color: var(--primary, #3b82f6);"></i>
+                    <span>Duplicate Category/Priority combos will <strong>update</strong> existing rules automatically.</span>
+                </div>
+            </div>
+
+            <form method="POST">
+                <input type="hidden" name="action" value="save">
+
+                <div class="mb-3">
+                    <label class="input-label">Ticket Category</label>
+                    <select name="ticket_type" class="form-select-custom w-100 shadow-sm" required>
+                        <option value="Incident">Incident (Break / Fix)</option>
+                        <option value="Request">Request (New setup / Access)</option>
+                        <option value="Problem">Problem (Recurring issues)</option>
+                        <option value="Change">Change (System modification)</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="input-label">Priority Level</label>
+                    <select name="priority" class="form-select-custom w-100 shadow-sm" required>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="High">High</option>
+                        <option value="Urgent">Urgent / Critical</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="input-label">Resolution Deadline (Hours)</label>
+                    <div class="input-group">
+                        <input type="number" name="hours" class="form-control form-control-custom shadow-sm" placeholder="e.g. 24" required min="1" max="8760" style="border-radius: 14px 0 0 14px;">
+                        <span class="input-group-text bg-transparent border-2 border-start-0 px-3 fw-800" style="border-radius: 0 14px 14px 0; border-color: var(--input-border); color: var(--text-tertiary); font-size: 0.8rem;">HRS</span>
+                    </div>
+                    <div class="mt-2 small px-1 d-flex justify-content-between fw-bold" style="color: var(--text-secondary);">
+                        <span>Min: 1 Hour</span>
+                        <span>24h = 1 Day</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-save-sla w-100">
+                    <i class="fa-solid fa-save me-2"></i> Save SLA Policy
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

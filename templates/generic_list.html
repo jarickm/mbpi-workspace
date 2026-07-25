@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .page-title { font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+    .table-bento-card { background: white; border-radius: 24px; padding: 15px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+    .table thead th { background: #f8fafc; border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 0.75rem; text-transform: uppercase; font-weight: 800; padding: 15px 20px; letter-spacing: 0.5px; }
+    .table tbody td { padding: 16px 20px; vertical-align: middle; color: #475569; font-size: 0.95rem; border-bottom: 1px solid #f8fafc; transition: all 0.2s; }
+    .table tbody tr:hover td { background-color: #fcfdfe; color: var(--primary); }
+    .cell-id { font-family: 'Monaco', 'Consolas', monospace; font-weight: 700; color: #94a3b8; }
+</style>
+
+<div class="mb-4">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1"><li class="breadcrumb-item small"><a href="#" class="text-decoration-none text-muted">System</a></li><li class="breadcrumb-item small active">Data View</li></ol></nav>
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="page-title m-0">{{ title }}</h2>
+        <div class="small fw-bold text-muted bg-white px-3 py-2 rounded-pill border shadow-sm"><i class="fa-solid fa-layer-group me-1 text-primary"></i>{{ rows|length }} Total Records</div>
+    </div>
+</div>
+
+<div class="table-bento-card">
+    <div class="table-responsive">
+        <table class="table table-borderless align-middle mb-0">
+            <thead>
+                <tr>{% for h in headers %}<th>{{ h }}</th>{% endfor %}</tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    {% for cell in row %}
+                    <td>
+                        {% if '#' in cell|string or 'ID' in headers[loop.index0]|string %}<span class="cell-id">{{ cell }}</span>
+                        {% else %}{{ cell }}{% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="{{ headers|length }}" class="text-center py-5">
+                        <div class="opacity-25 mb-3"><i class="fa-solid fa-database fa-3x"></i></div>
+                        <h5 class="text-muted fw-bold">No data available for this view.</h5>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBPI Helpdesk | Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #002e5d;
+            --accent: #d71921;
+            --body-bg: #f4f7f9;
+            --glass: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(255, 255, 255, 0.6);
+        }
+
+        body, html { height: 100%; margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; background-color: var(--body-bg); }
+
+        /* Premium Mesh Gradient Background */
+        .mesh-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background-color: #f4f7f9;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(0, 46, 93, 0.05) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(215, 25, 33, 0.03) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(0, 46, 93, 0.05) 0px, transparent 50%);
+        }
+
+        .wrapper { height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+
+        /* Bento Card V2 */
+        .bento-card {
+            display: flex; width: 100%; max-width: 1000px; height: 640px;
+            background: var(--glass); backdrop-filter: blur(12px);
+            border-radius: 32px; border: 1px solid var(--card-border);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.08); overflow: hidden; position: relative;
+        }
+
+        .visual-side {
+            flex: 1; background: linear-gradient(135deg, var(--primary) 0%, #001a35 100%);
+            padding: 60px; display: flex; flex-direction: column; justify-content: space-between;
+            color: white; position: relative; overflow: hidden;
+        }
+
+        .visual-side::after {
+            content: ""; position: absolute; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 30px 30px; top: 0; left: 0; opacity: 0.5;
+        }
+
+        .support-tag {
+            background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 100px;
+            font-size: 0.7rem; font-weight: 800; letter-spacing: 1.2px;
+            display: inline-flex; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .support-tag .dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 12px #22c55e; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+
+        .form-side { flex: 1; padding: 60px 80px; background: white; display: flex; flex-direction: column; justify-content: center; }
+
+        .brand-logo { font-size: 2rem; font-weight: 900; color: var(--primary); margin-bottom: 8px; letter-spacing: -1px; }
+        .brand-logo span { color: var(--accent); }
+
+        .form-side h2 { font-weight: 800; font-size: 1.8rem; margin-bottom: 10px; color: #1e293b; letter-spacing: -0.5px; }
+        .form-side p.subtitle { color: #64748b; font-weight: 500; margin-bottom: 35px; font-size: 0.95rem; }
+
+        /* V2 Inputs */
+        .input-wrapper { position: relative; margin-bottom: 20px; }
+        .input-wrapper i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1rem; transition: 0.3s; }
+
+        .form-control {
+            height: 60px; padding-left: 55px; border-radius: 18px; border: 2px solid #f1f5f9;
+            background: #f8fafc; font-weight: 600; color: #1e293b; transition: 0.3s;
+        }
+        .form-control::placeholder { color: #94a3b8; font-weight: 500; }
+        .form-control:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 5px rgba(0, 46, 93, 0.05); }
+        .form-control:focus + i { color: var(--primary); }
+
+        .btn-awesome {
+            height: 60px; background: var(--primary); border: none; border-radius: 18px;
+            color: white; font-weight: 800; width: 100%; display: flex; align-items: center;
+            justify-content: center; gap: 12px; transition: 0.3s all ease;
+            box-shadow: 0 10px 25px rgba(0, 46, 93, 0.15); font-size: 1rem; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .btn-awesome:hover { background: #001f40; transform: translateY(-2px); box-shadow: 0 15px 30px rgba(0, 46, 93, 0.2); color: white; }
+
+        .feature-item { display: flex; gap: 20px; margin-bottom: 30px; position: relative; z-index: 2; }
+        .feature-icon {
+            width: 48px; height: 48px; background: rgba(255,255,255,0.1); border-radius: 14px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Toasts */
+        .toast-container { position: fixed; top: 30px; right: 30px; z-index: 1000; }
+        .modern-toast {
+            background: white; border-radius: 24px; padding: 20px 25px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15); border-left: 6px solid var(--accent);
+            display: flex; align-items: center; gap: 18px;
+            animation: slideIn 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        @media (max-width: 992px) {
+            .visual-side { display: none; }
+            .bento-card { max-width: 450px; height: auto; border-radius: 24px; }
+            .form-side { padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="mesh-bg"></div>
+
+    <div class="toast-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="modern-toast">
+                        <div style="color: var(--accent);"><i class="fas fa-shield-halved fa-2x"></i></div>
+                        <div>
+                            <div class="fw-800" style="color: #1e293b;">Login Issue</div>
+                            <div class="small fw-600 text-muted">{{ message }}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="wrapper">
+        <div class="bento-card">
+            <!-- Left Side: Branding & Features -->
+            <div class="visual-side">
+                <div>
+                    <div class="support-tag"><span class="dot"></span> HELPDESK ACTIVE</div>
+                    <h1 class="mt-4 fw-800" style="font-size: 2.8rem; line-height: 1.1; letter-spacing: -1.5px;">MBPI<br>Helpdesk<span>.</span></h1>
+                    <p class="opacity-75 mt-3 fw-500">Official technical support portal for Masterbatch Philippines, Inc.</p>
+                </div>
+
+                <div class="features">
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-share-nodes"></i></div>
+                        <div>
+                            <div class="fw-800">Inter-Departmental</div>
+                            <div class="small opacity-60 fw-500">Route requests to any department instantly</div>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-bolt-lightning"></i></div>
+                        <div>
+                            <div class="fw-800">High-Speed Resolution</div>
+                            <div class="small opacity-60 fw-500">Automated tracking & SLA alerts</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="small fw-800 opacity-50" style="letter-spacing: 1px;">VERSION 2.5</div>
+                    <div class="small fw-800 opacity-50">STABLE BUILD</div>
+                </div>
+            </div>
+
+            <!-- Right Side: Form -->
+            <div class="form-side">
+                <div class="brand-logo">MBPI<span>.</span></div>
+                <h2>Portal Access</h2>
+                <p class="subtitle">Enter your employee credentials to enter the hub.</p>
+
+                <form method="POST">
+                    <div class="input-wrapper">
+                        <input type="text" name="username" class="form-control shadow-none" placeholder="Username" required autofocus>
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="password" name="password" class="form-control shadow-none" placeholder="Password" required>
+                        <i class="fas fa-key"></i>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input shadow-none" type="checkbox" id="rem">
+                            <label class="form-check-label small fw-700 text-muted" for="rem" style="cursor:pointer">Remember me</label>
+                        </div>
+                        <a href="#" class="small text-decoration-none fw-800" style="color: var(--primary)">Reset Access?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-awesome">
+                        Sign In to Helpdesk <i class="fas fa-chevron-right ms-1" style="font-size: 0.8rem;"></i>
+                    </button>
+                </form>
+
+                <div class="mt-auto pt-5 text-center">
+                    <p class="small fw-700 text-muted opacity-50">&copy; 2026 Masterbatch Philippines, Inc.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        setTimeout(() => {
+            const toasts = document.querySelectorAll('.modern-toast');
+            toasts.forEach(t => {
+                t.style.transition = "1s cubic-bezier(0.23, 1, 0.32, 1)";
+                t.style.opacity = "0";
+                t.style.transform = "translateX(100px)";
+                setTimeout(() => t.remove(), 1000);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

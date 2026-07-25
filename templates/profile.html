@@ -1,0 +1,286 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Identity Card (Left) --- */
+    .profile-card {
+        background: linear-gradient(135deg, var(--primary, #3b82f6) 0%, #1e1b4b 100%);
+        border-radius: 30px;
+        padding: 40px 30px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        height: 100%;
+        box-shadow: 0 20px 40px rgba(0, 46, 93, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Ambient corner glow for Identity Card */
+    .profile-card::before {
+        content: ''; position: absolute; top: -50px; right: -50px; width: 180px; height: 180px;
+        background: #3b82f6; border-radius: 50%; filter: blur(60px); opacity: 0.3;
+    }
+
+    .user-avatar-giant {
+        width: 110px; height: 110px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+        border-radius: 32px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 3rem; font-weight: 900;
+        margin-bottom: 25px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        z-index: 1;
+    }
+
+    .role-badge-v2 {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        backdrop-filter: blur(5px);
+        padding: 6px 20px; border-radius: 100px;
+        font-size: 0.75rem; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 1.5px;
+        margin-bottom: 30px; z-index: 1;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    /* Info Bar at bottom of Profile Card */
+    .auth-status-box {
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 15px 20px;
+        width: 100%;
+        text-align: left;
+        margin-top: auto;
+        z-index: 1;
+    }
+
+    /* --- Signature Card (Right) --- */
+    .signature-card {
+        background: var(--surface-bento);
+        border-radius: 30px;
+        border: 1px solid var(--border-bento);
+        padding: 35px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .signature-preview-area {
+        background: var(--input-bg);
+        border: 2px dashed var(--border-bento);
+        border-radius: 24px;
+        flex-grow: 1;
+        min-height: 250px;
+        display: flex;
+        align-items: center; justify-content: center;
+        position: relative;
+        margin: 20px 0;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .signature-preview-area img {
+        max-height: 180px; max-width: 90%;
+        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.08));
+    }
+
+    /* Custom File Upload Bar */
+    .v2-upload-bar {
+        background: var(--input-bg);
+        border: 1px solid var(--border-bento);
+        border-radius: 18px;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .v2-upload-bar:focus-within {
+        border-color: var(--primary, #3b82f6);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .form-control-v2-file {
+        background: transparent; border: none; color: var(--text-primary);
+        font-size: 0.85rem; font-weight: 600; padding: 5px 10px;
+    }
+
+    .btn-v2-primary {
+        background: var(--primary, #3b82f6); color: white !important; border: none;
+        border-radius: 14px; padding: 10px 25px; font-weight: 700;
+        transition: all 0.3s ease;
+    }
+    .btn-v2-primary:hover { background: #1d4ed8; transform: translateY(-2px); }
+
+    /* Dark Mode specific elements */
+    body.dark-mode .signature-preview-area img {
+        filter: invert(1) hue-rotate(180deg) brightness(1.6) contrast(1.1); /* Flawless ink inversion for dark mode */
+    }
+
+    .icon-box.c-blue {
+        background: rgba(59, 130, 246, 0.1);
+        color: #3b82f6;
+    }
+</style>
+
+<!-- Header -->
+<div class="mb-4 mt-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">Workspace</li>
+            <li class="breadcrumb-item small fw-bold" style="color: var(--primary, #3b82f6);">Account Profile</li>
+        </ol>
+    </nav>
+    <h2 class="page-title m-0">Account Dashboard</h2>
+</div>
+
+<div class="row g-4 content-row">
+    <!-- LEFT: IDENTITY CARD -->
+    <div class="col-lg-4">
+        <div class="profile-card">
+            <div class="user-avatar-giant shadow">
+                {{ session.username[0] | upper }}
+            </div>
+
+            <h3 class="fw-900 m-0">{{ session.full_name or session.username }}</h3>
+            <p class="opacity-75 small fw-bold mb-3">{{ session.email or 'name@polycolor.biz' }}</p>
+
+            <div class="role-badge-v2 shadow-sm">{{ session.user_role or 'Employee' }}</div>
+
+            <!-- Meta Data Box -->
+            <div class="auth-status-box">
+                <div class="small fw-800 text-uppercase opacity-50 mb-2" style="font-size: 0.65rem; letter-spacing: 0.5px;">Account Verification</div>
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-info"></i>
+                        <span class="fw-800 small">Verified Profile</span>
+                    </div>
+                    <span class="small opacity-50">#{{ session.user_id }}</span>
+                </div>
+            </div>
+
+            <div class="w-100 text-start mt-4 px-2">
+                <div class="small fw-800 opacity-40 text-uppercase mb-1" style="font-size: 0.6rem;">Department Access</div>
+                <div class="fw-bold small"><i class="fa-solid fa-building-user me-2 opacity-75"></i>{{ session.user_department or 'Unassigned' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: ASSET MANAGEMENT (SIGNATURE) -->
+    <div class="col-lg-8">
+        <div class="signature-card">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-box c-blue d-flex align-items-center justify-content-center" style="width: 45px; height: 45px; border-radius: 12px; font-size: 1.1rem;">
+                        <i class="fa-solid fa-file-signature"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-800 m-0" style="color: var(--text-primary);">Digital Signature Asset</h5>
+                        <p class="small mb-0" style="color: var(--text-secondary);">Authorized biometric file for automated IER form processing.</p>
+                    </div>
+                </div>
+                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-20 px-3 py-2 rounded-pill fw-800" style="font-size: 0.75rem;">
+                    <i class="fa-solid fa-shield-halved me-1"></i> Secured
+                </span>
+            </div>
+
+            <div class="signature-preview-area">
+                <div class="position-absolute top-0 start-0 m-3 small fw-800 text-uppercase" style="letter-spacing: 1px; font-size: 0.65rem; color: var(--text-tertiary);">System Preview</div>
+
+                {% if has_signature %}
+                    <img src="{{ url_for('serve_signature', user_id=session.user_id) }}?v={{ range(1, 999) | random }}" alt="Signature">
+                {% else %}
+                    <div class="text-center" style="color: var(--text-tertiary); opacity: 0.6;">
+                        <i class="fa-solid fa-signature fa-4x mb-3"></i>
+                        <div class="fw-900 small">NO ASSET DETECTED</div>
+                        <p class="small fw-bold mt-1">Please upload a clear PNG signature</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                <label class="form-label-v2 mb-2">Update Signature Asset</label>
+                <div class="v2-upload-bar">
+                    <input type="file" name="signature" class="form-control form-control-v2-file shadow-none" required accept="image/*">
+                    <button class="btn-v2-primary shadow-sm d-flex align-items-center" type="submit">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload New
+                    </button>
+                </div>
+                <small class="mt-2 d-block px-2" style="font-size: 0.7rem; color: var(--text-secondary);">Supported formats: PNG, JPG, JPEG (Max 2MB). Recommended: Transparent Background.</small>
+            </form>
+
+            <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2" style="border-color: var(--border-bento) !important;">
+                <div class="small fw-bold d-flex align-items-center gap-2" style="color: var(--text-secondary);">
+                    <div class="dot" style="background: #10b981; width: 8px; height: 8px; border-radius: 50%;"></div>
+                    256-bit Encrypted Asset Storage
+                </div>
+                <button type="button" class="btn btn-link p-0 text-danger text-decoration-none small fw-800 border-0 bg-transparent opacity-75 hover-opacity-100">
+                    <i class="fa-solid fa-trash-can me-1"></i> Clear Asset
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // Any specific V2 profile JS can go here
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+
+        --action-grad: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Action Button --- */
+    .btn-v2-primary {
+        background: var(--action-grad);
+        color: white !important;
+        border: none;
+        border-radius: 14px;
+        padding: 0 24px;
+        height: 44px;
+        font-weight: 800;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.15);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .btn-v2-primary:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3);
+        color: white !important;
+    }
+    .btn-v2-primary:active { transform: translateY(0); }
+
+    /* --- Kanban Board Layout --- */
+    .kanban-board {
+        display: flex; gap: 24px; overflow-x: auto; padding: 10px 5px 30px 5px;
+        scrollbar-width: thin; scrollbar-color: var(--border-bento) transparent;
+    }
+    .kanban-board::-webkit-scrollbar { height: 6px; }
+    .kanban-board::-webkit-scrollbar-thumb { background: var(--border-bento); border-radius: 10px; }
+
+    .kanban-column {
+        background: var(--surface-bento); border-radius: 28px; min-width: 320px; max-width: 320px;
+        padding: 20px 15px; min-height: calc(100vh - 250px); border: 1px solid var(--border-bento);
+        display: flex; flex-direction: column; gap: 15px;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .column-header {
+        padding: 10px 15px; display: flex; justify-content: space-between; align-items: center;
+        position: sticky; top: 0; background: var(--surface-bento); z-index: 10;
+        transition: background-color 0.3s ease;
+    }
+    .status-indicator { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+
+    /* Project Card V2 */
+    .project-card-v2 {
+        background: var(--surface-bento); border-radius: 20px; padding: 20px;
+        border: 1px solid var(--border-bento); cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        box-shadow: var(--card-shadow); position: relative;
+    }
+    .project-card-v2:hover { transform: translateY(-5px); border-color: var(--primary, #3b82f6); box-shadow: var(--card-shadow-hover); }
+
+    .prio-high { border-left: 5px solid #ef4444; }
+    .prio-medium { border-left: 5px solid #ea580c; }
+    .prio-low { border-left: 5px solid #10b981; }
+
+    /* --- Modal V2 Split Layout --- */
+    .modal-content-split { border-radius: 32px; border: 1px solid var(--border-bento); background: var(--surface-bento); overflow: hidden; }
+    .modal-details-pane { padding: 40px; background: var(--surface-bento); border-right: 1px solid var(--border-bento) !important; }
+    .modal-activity-pane { padding: 40px; background: var(--input-bg); display: flex; flex-direction: column; }
+
+    .form-label-v2 { font-size: 0.75rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+
+    .form-control-v2 {
+        background: var(--input-bg); border: 1px solid var(--border-bento);
+        border-radius: 12px; padding: 10px 15px; color: var(--text-primary); font-weight: 600; width: 100%;
+        transition: all 0.2s;
+    }
+    .form-control-v2:focus { border-color: var(--primary, #3b82f6); outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+    .update-bubble-v2 {
+        background: var(--surface-bento); border-radius: 18px; padding: 15px; margin-bottom: 15px;
+        border: 1px solid var(--border-bento); box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .btn-action-v2 {
+        background: var(--surface-bento); border: 1px solid var(--border-bento);
+        border-radius: 14px; padding: 10px 20px; font-weight: 700;
+        color: var(--text-primary); transition: all 0.2s ease;
+        text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .btn-action-v2:hover { border-color: var(--primary, #3b82f6); color: var(--primary, #3b82f6); }
+
+    /* Custom Icon action Boxes */
+    .icon-box {
+        display: flex; align-items: center; justify-content: center; text-decoration: none;
+        transition: transform 0.2s, background-color 0.2s;
+    }
+    .icon-box:hover { transform: scale(1.05); }
+    .icon-box.c-indigo { background: rgba(99, 102, 241, 0.12) !important; color: #6366f1; }
+    .icon-box.c-red { background: rgba(239, 68, 68, 0.12) !important; color: #ef4444; }
+
+    /* Backdrop blur check */
+    .modal-backdrop.show { opacity: 0.4; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); background-color: #0f172a; }
+
+    /* ========================================= */
+    /* --- BROWSER DROPDOWN VISIBILITY FIX --- */
+    /* ========================================= */
+    select option {
+        background-color: var(--surface-bento) !important;
+        color: var(--text-primary) !important;
+    }
+</style>
+
+<!-- Header Toolbar -->
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 mt-2">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">Project Office</li>
+                <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">Roadmap</li>
+            </ol>
+        </nav>
+        <h2 class="page-title m-0">Project Lifecycle</h2>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+        <!-- Integrated Search -->
+        <div class="toolbar-search d-none d-md-flex" style="background: var(--surface-bento); border: 1px solid var(--border-bento); border-radius: 14px; padding: 0 15px; width: 260px; height: 44px; align-items: center; transition: border-color 0.2s;">
+            <i class="fa-solid fa-magnifying-glass" style="color: var(--text-tertiary); margin-right: 8px;"></i>
+            <input type="text" id="projectSearch" class="border-0 bg-transparent small fw-bold shadow-none" placeholder="Search projects..." onkeyup="filterProjects()" style="outline: none; width: 100%; color: var(--text-primary);">
+        </div>
+
+        <a href="{{ url_for('it_project_analytics') }}" class="btn-action-v2">
+            <i class="fa-solid fa-chart-pie me-2" style="color: #6366f1;"></i> Analytics
+        </a>
+
+        <!-- UPDATED BUTTON: HIGH CONTRAST -->
+        <button type="button" class="btn-v2-primary" onclick="openAddModal()">
+            <i class="fa-solid fa-plus-circle"></i> New Project
+        </button>
+    </div>
+</div>
+
+<!-- Kanban Board -->
+<div class="kanban-board">
+    {% for status in ['Planning', 'In Progress', 'Testing', 'Completed'] %}
+    <div class="kanban-column">
+        <div class="column-header">
+            <div class="fw-900 small text-uppercase d-flex align-items-center" style="color: var(--text-secondary);">
+                <span class="status-indicator" style="background:
+                    {% if status == 'Planning' %}#6366f1
+                    {% elif status == 'In Progress' %}#3b82f6
+                    {% elif status == 'Testing' %}#a855f7
+                    {% else %}#10b981{% endif %};"></span>
+                {{ status }}
+            </div>
+            <span class="badge border px-2 py-1 rounded-pill small fw-800" style="background: var(--input-bg) !important; color: var(--text-primary) !important; border-color: var(--border-bento) !important; font-size: 0.7rem;">
+                {{ projects|selectattr('status', 'equalto', status)|list|length }}
+            </span>
+        </div>
+
+        <div class="project-container d-flex flex-column gap-3">
+            {% for p in projects if p.status == status %}
+            <div class="project-card-v2 prio-{{ p.priority|lower }}" data-title="{{ p.title|lower }}"
+                 onclick="openEditModal('{{ p.id }}', '{{ p.title|replace("'", "\\'")|safe }}', '{{ p.description|replace("'", "\\'")|replace("\n", " ") |safe }}', '{{ p.priority }}', '{{ p.status }}', '{{ p.start_date }}', '{{ p.end_date }}', '{{ p.lead_it|replace("'", "\\'")|safe }}', '{{ p.co_head_it|replace("'", "\\'")|safe }}')">
+
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="fw-800 m-0 lh-base" style="font-size: 0.95rem; color: var(--text-primary);">{{ p.title }}</h6>
+                    <span class="small fw-800" style="color: var(--text-tertiary);">#{{ p.id }}</span>
+                </div>
+
+                <p class="small mb-3 fw-500" style="color: var(--text-secondary);">{{ p.description[:85] }}{% if p.description|length > 85 %}...{% endif %}</p>
+
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="badge rounded-pill small fw-800" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6; font-size: 0.65rem;">
+                        <i class="fa-solid fa-user-tie me-1"></i> {{ p.lead_it }}
+                    </span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-2 opacity-75">
+                    <div class="small fw-800" style="color: var(--text-secondary);">
+                        <i class="fa-regular fa-calendar-check me-1"></i> {{ p.end_date }}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5 border rounded-4 opacity-25" style="border: 2px dashed var(--border-bento) !important; color: var(--text-tertiary);">
+                <i class="fa-solid fa-folder-open mb-2fs-4"></i>
+                <div class="small fw-bold">No Projects</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- V2 PROJECT WORKSPACE MODAL -->
+<div class="modal fade" id="projectWorkspaceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content modal-content-split">
+            <div class="modal-body p-0">
+                <div class="row g-0">
+                    <div class="col-lg-7 modal-details-pane">
+                        <div class="d-flex justify-content-between align-items-center mb-5">
+                            <h4 class="fw-900 m-0" id="modalTitle" style="color: var(--text-primary); letter-spacing: -0.5px;">Project Node</h4>
+                            <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" style="filter: var(--close-btn-filter);"></button>
+                        </div>
+
+                        <form method="POST">
+                            <input type="hidden" name="action" id="modalAction" value="add_project">
+                            <input type="hidden" name="id" id="projectId">
+
+                            <div class="mb-4">
+                                <label class="form-label-v2">Strategic Title *</label>
+                                <input type="text" name="title" id="formTitle" class="form-control-v2" required placeholder="Project Name">
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label-v2">Lifecycle Description</label>
+                                <textarea name="description" id="formDesc" class="form-control-v2" rows="3" placeholder="Provide description..."></textarea>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-6">
+                                    <label class="form-label-v2">Criticality</label>
+                                    <select name="priority" id="formPrio" class="form-control-v2">
+                                        <option>Low</option><option selected>Medium</option><option>High</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label-v2">Lifecycle Phase</label>
+                                    <select name="status" id="formStatus" class="form-control-v2">
+                                        <option>Planning</option><option>In Progress</option><option>Testing</option><option>Completed</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-6">
+                                    <label class="form-label-v2">Deployment Date</label>
+                                    <input type="date" name="start_date" id="formStart" class="form-control-v2" required>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label-v2">Target Completion</label>
+                                    <input type="date" name="end_date" id="formEnd" class="form-control-v2" required>
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-5">
+                                <div class="col-6">
+                                    <label class="form-label-v2">Lead Engineer</label>
+                                    <select name="lead_it" id="formLead" class="form-control-v2" required>
+                                        <option value="">-- Choose Specialist --</option>
+                                        {% for s in it_staff %}<option value="{{ s.it_name }}">{{ s.it_name }}</option>{% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label-v2">Collaborating Co-Head</label>
+                                    <select name="co_head_it" id="formCoHead" class="form-control-v2">
+                                        <option value="">-- None --</option>
+                                        {% for s in it_staff %}<option value="{{ s.it_name }}">{{ s.it_name }}</option>{% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-3">
+                                <button type="submit" class="btn btn-v2-primary flex-grow-1" style="height: 54px; font-size: 1rem;">COMMIT CHANGES</button>
+                                <button type="submit" name="action" value="delete_project" id="btnDelete" class="icon-box c-red" style="width: 54px; height: 54px; border-radius: 16px; border: none;" onclick="return confirm('Wipe project node permanently?');">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="col-lg-5 modal-activity-pane" id="updatesSection">
+                        <div class="d-flex align-items-center gap-2 mb-4">
+                            <div class="icon-box c-indigo" style="width: 32px; height: 32px; font-size: 0.8rem;"><i class="fa-solid fa-timeline"></i></div>
+                            <h6 class="fw-800 m-0" style="color: var(--text-primary);">Meeting Logs & Timeline</h6>
+                        </div>
+
+                        <div id="updatesList" class="flex-grow-1" style="max-height: 450px; overflow-y: auto;">
+                            <!-- Content -->
+                        </div>
+
+                        <form method="POST" class="mt-4 pt-3 border-top" style="border-color: var(--border-bento) !important;">
+                            <input type="hidden" name="action" value="add_update">
+                            <input type="hidden" name="id" id="updateProjectId">
+                            <div class="position-relative">
+                                <textarea name="update_text" class="form-control-v2" rows="2" placeholder="Record technical update..." required style="padding-right: 50px;"></textarea>
+                                <button type="submit" class="btn btn-dark position-absolute" style="right: 8px; bottom: 8px; border-radius: 8px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0;">
+                                    <i class="fa-solid fa-paper-plane" style="font-size: 0.7rem;"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const allUpdates = [
+        {% for u in updates %}
+        {
+            pid: "{{ u.project_id }}",
+            text: "{{ u.update_text|replace('"', '\\"')|replace('\n', ' ')|replace('\r', '') }}",
+            auth: "{{ u.author|replace('"', '\\"') }}",
+            date: "{{ u.created_at.strftime('%b %d, %H:%M') }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    (function() {
+        const modalEl = document.getElementById('projectWorkspaceModal');
+        if (modalEl && modalEl.parentElement !== document.body) { document.body.appendChild(modalEl); }
+
+        window.filterProjects = function() {
+            const query = document.getElementById('projectSearch').value.toLowerCase();
+            document.querySelectorAll('.project-card-v2').forEach(card => {
+                card.style.display = card.getAttribute('data-title').includes(query) ? 'block' : 'none';
+            });
+        };
+
+        window.openAddModal = function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('modalAction').value = 'add_project';
+            document.getElementById('modalTitle').innerText = 'Initialize Project';
+            document.getElementById('btnDelete').style.display = 'none';
+            document.getElementById('updatesSection').classList.add('d-none');
+            ['formTitle', 'formDesc', 'formLead', 'formCoHead'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('formStart').value = today;
+            document.getElementById('formEnd').value = today;
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        };
+
+        window.openEditModal = function(id, title, desc, prio, status, start, end, lead, cohead) {
+            document.getElementById('modalAction').value = 'edit_project';
+            document.getElementById('projectId').value = id;
+            document.getElementById('updateProjectId').value = id;
+            document.getElementById('modalTitle').innerText = 'Update Node';
+            document.getElementById('btnDelete').style.display = 'flex';
+            document.getElementById('updatesSection').classList.remove('d-none');
+            document.getElementById('formTitle').value = title;
+            document.getElementById('formDesc').value = desc;
+            document.getElementById('formPrio').value = prio;
+            document.getElementById('formStatus').value = status;
+            document.getElementById('formStart').value = start;
+            document.getElementById('formEnd').value = end;
+            document.getElementById('formLead').value = lead;
+            document.getElementById('formCoHead').value = cohead;
+            const list = document.getElementById('updatesList');
+            list.innerHTML = '';
+            allUpdates.filter(u => u.pid == id).forEach(u => {
+                list.innerHTML += `<div class="update-bubble-v2">
+                    <div class="small fw-800 text-primary mb-1">${u.auth} <span class="text-muted fw-normal mx-1">|</span> ${u.date}</div>
+                    <div class="small text-color lh-base">${u.text}</div>
+                </div>`;
+            });
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        };
+
+        // Dark Mode check for Close Button filter variables
+        const bodyEl = document.body;
+        const setCloseBtnFilter = () => {
+            if (bodyEl.classList.contains('dark-mode')) {
+                document.documentElement.style.setProperty('--close-btn-filter', 'invert(1) grayscale(100%) brightness(200%)');
+            } else {
+                document.documentElement.style.setProperty('--close-btn-filter', 'none');
+            }
+        };
+        setCloseBtnFilter();
+        const observer = new MutationObserver(setCloseBtnFilter);
+        observer.observe(bodyEl, { attributes: true, attributeFilter: ['class'] });
+    })();
+</script>
+{% endblock %}

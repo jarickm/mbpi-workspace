@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Segmented Control --- */
+    .segmented-control {
+        display: inline-flex; background: var(--surface-bento); padding: 5px;
+        border-radius: 20px; border: 1px solid var(--border-bento);
+        height: 48px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .seg-tab {
+        padding: 6px 25px; border-radius: 14px; font-weight: 700; font-size: 0.85rem;
+        text-decoration: none; color: var(--text-tertiary); transition: all 0.2s ease;
+        display: flex; align-items: center; gap: 8px; border: none; background: transparent;
+    }
+    .seg-tab.active { background: var(--bg-main); color: var(--text-primary); border: 1px solid var(--border-bento); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .seg-tab:not(.active):hover { color: var(--text-primary); }
+
+    /* --- Bento Stepper Cards --- */
+    .step-card {
+        background: var(--surface-bento); border: 1px solid var(--border-bento);
+        padding: 24px; border-radius: 24px; position: relative; overflow: hidden;
+        transition: transform 0.3s ease, background-color 0.3s ease; height: 100%;
+        box-shadow: var(--card-shadow);
+    }
+    .step-card:hover { transform: translateY(-3px); box-shadow: var(--card-shadow-hover); }
+
+    .step-badge {
+        width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center;
+        justify-content: center; font-weight: 800; font-size: 0.9rem; margin-bottom: 15px;
+    }
+    .step-badge.c-blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .step-badge.c-purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+    .step-badge.c-green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+    /* --- Form Sections --- */
+    .form-section-v2 {
+        background: var(--surface-bento); border: 1px solid var(--border-bento);
+        border-radius: 28px; padding: 35px; margin-bottom: 25px; box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .section-header-v2 {
+        font-size: 0.75rem; font-weight: 900; color: var(--primary, #3b82f6);
+        text-transform: uppercase; letter-spacing: 1.5px; display: flex;
+        align-items: center; gap: 10px; margin-bottom: 25px;
+    }
+    .section-header-v2::after { content: ''; flex-grow: 1; height: 1px; background: var(--border-bento); }
+
+    /* --- Inputs --- */
+    .form-label-v2 { font-size: 0.72rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+
+    .form-control-v2 {
+        background: var(--input-bg); border: 1px solid var(--input-border);
+        border-radius: 14px; padding: 12px 18px; color: var(--text-primary);
+        font-weight: 600; width: 100%; transition: all 0.2s;
+    }
+    .form-control-v2:focus { border-color: var(--primary, #3b82f6); outline: none; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+    .form-control-v2::placeholder { color: var(--text-tertiary); }
+
+    /* --- Custom Dynamic Matrix Table --- */
+    .mat-grid-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+    .mat-grid-table th { font-size: 0.68rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; padding: 0 15px; letter-spacing: 0.5px; }
+    .mat-grid-table td { padding: 0; }
+
+    .mat-input-v2 {
+        background: var(--input-bg); border: 1px solid var(--input-border);
+        padding: 12px 16px; width: 100%; font-size: 0.88rem; font-weight: 600; color: var(--text-primary);
+        transition: all 0.2s;
+    }
+    .mat-input-v2:focus { background: var(--surface-bento); border-color: var(--primary, #3b82f6); outline: none; z-index: 2; position: relative; }
+
+    .mat-row-first { border-radius: 12px 0 0 12px; }
+    .mat-row-last { border-radius: 0 12px 12px 0; }
+
+    /* --- Unified Data Table --- */
+    .data-table-bento { background: var(--surface-bento); border-radius: 28px; border: 1px solid var(--border-bento); box-shadow: var(--card-shadow); overflow: hidden; }
+
+    /* ========================================= */
+    /* --- BOOTSTRAP TABLE BACKGROUND FIX --- */
+    /* ========================================= */
+    .table,
+    .table > tbody,
+    .table > tbody > tr,
+    .table > tbody > tr > td,
+    .table > thead > tr > th {
+        background-color: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-striped-bg: transparent !important;
+    }
+
+    .table thead th {
+        color: var(--text-tertiary); font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 1px; padding: 18px 25px; border-bottom: 1px solid var(--border-bento); font-weight: 800;
+        background: rgba(0,0,0,0.02) !important;
+    }
+    .table tbody td { padding: 18px 25px; vertical-align: middle; border-bottom: 1px solid var(--border-bento); color: var(--text-primary); font-size: 0.9rem; }
+    .table tbody tr:hover { background-color: var(--row-hover-bg) !important; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    .ier-ref {
+        font-family: 'JetBrains Mono', monospace; font-weight: 800; background: var(--input-bg);
+        padding: 5px 12px; border-radius: 8px; color: var(--text-primary); border: 1px solid var(--border-bento);
+        font-size: 0.85rem;
+    }
+
+    /* Custom Icon action Boxes */
+    .icon-box {
+        display: flex; align-items: center; justify-content: center; text-decoration: none;
+        transition: transform 0.2s, background-color 0.2s;
+    }
+    .icon-box:hover { transform: scale(1.05); }
+    .icon-box.c-blue { background: rgba(59, 130, 246, 0.15) !important; color: #3b82f6; }
+    .icon-box.c-orange { background: rgba(249, 115, 22, 0.15) !important; color: #ea580c; }
+</style>
+
+<div class="mb-4 mt-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">Workspace</li>
+            <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">IER Form B</li>
+        </ol>
+    </nav>
+    <h2 class="page-title m-0">Investigation & Action Report</h2>
+</div>
+
+{% if edit_data %}
+<!-- ========================================== EDIT VIEW ========================================== -->
+<div class="fade-in">
+    <!-- Warning Banner -->
+    <div class="alert p-4 mb-4 rounded-4 d-flex justify-content-between align-items-center flex-wrap gap-3" style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.3);">
+        <div class="d-flex align-items-center gap-3">
+            <div class="icon-box c-blue d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px; background: rgba(99, 102, 241, 0.15) !important; color: #6366f1;"><i class="fa-solid fa-microchip fs-5"></i></div>
+            <div>
+                <h6 class="m-0 fw-800" style="color: #6366f1;">Editing Technical Log: {{ edit_data.ier_no }}</h6>
+                <p class="m-0 small" style="color: var(--text-secondary); margin-top: 2px;">Update findings, timestamps, and material consumption logs.</p>
+            </div>
+        </div>
+        <a href="{{ url_for('ier_b') }}" class="btn btn-sm fw-bold px-4 rounded-pill ajax-link text-white" style="background: #6366f1; border: none;">Discard Changes</a>
+    </div>
+
+    <form action="{{ url_for('edit_ier_b', id=edit_data.id) }}" method="POST">
+        <!-- 01 General -->
+        <div class="form-section-v2">
+            <span class="section-header-v2">01. Identification & Reference</span>
+            <div class="row g-3">
+                <div class="col-md-3"><label class="form-label-v2">IER-B Log No.</label><input type="text" name="ier_no" class="form-control-v2 shadow-none" value="{{ edit_data.ier_no }}" required></div>
+                <div class="col-md-3"><label class="form-label-v2">Associated Form A</label><input type="text" name="ref_ier_a_no" class="form-control-v2 shadow-none" value="{{ edit_data.ref_ier_a_no }}"></div>
+                <div class="col-md-3"><label class="form-label-v2">Reporting Date</label><input type="date" name="date_reported" class="form-control-v2 shadow-none" value="{{ edit_data.date_reported }}"></div>
+                <div class="col-md-3"><label class="form-label-v2">Assigned Personnel</label><input type="text" name="employee_name" class="form-control-v2 shadow-none" value="{{ edit_data.employee_name }}"></div>
+                <div class="col-md-6"><label class="form-label-v2">Unit Description</label><input type="text" name="item_description" class="form-control-v2 shadow-none" value="{{ edit_data.item_description }}"></div>
+                <div class="col-md-6"><label class="form-label-v2">Department</label><input type="text" name="department" class="form-control-v2 shadow-none" value="{{ edit_data.department }}"></div>
+            </div>
+        </div>
+
+        <!-- 02 Analysis -->
+        <div class="form-section-v2">
+            <span class="section-header-v2">02. Root Cause & Signatories</span>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <label class="form-label-v2">Lead Technician</label>
+                    <select name="prepared_by_id" class="form-control-v2 shadow-none">
+                        <option value="">-- Select --</option>
+                        {% for u in it_staff %}
+                        <option value="{{ u.user_id }}" {% if u.user_id == edit_data.prepared_by_id %}selected{% endif %}>{{ u.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label-v2">Technical Supervisor</label>
+                    <select name="noted_by_id" class="form-control-v2 shadow-none">
+                        <option value="">-- Select --</option>
+                        {% for u in it_staff %}
+                        <option value="{{ u.user_id }}" {% if u.user_id == edit_data.noted_by_id %}selected{% endif %}>{{ u.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label-v2">Asset Dept. Receiver</label>
+                    <select name="received_by_id" class="form-control-v2 shadow-none">
+                        <option value="">-- Select --</option>
+                        {% for u in all_users %}
+                        <option value="{{ u.user_id }}" {% if u.user_id == edit_data.received_by_id %}selected{% endif %}>{{ u.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12"><label class="form-label-v2">Detailed Cause of Failure</label><textarea name="cause_issue" class="form-control-v2 shadow-none" rows="4">{{ edit_data.cause_issue }}</textarea></div>
+            </div>
+        </div>
+
+        <!-- 03 Materials -->
+        <div class="form-section-v2">
+            <span class="section-header-v2">03. Consumed Technical Materials</span>
+            <div class="table-responsive">
+                <table class="mat-grid-table" id="editMatTable">
+                    <thead><tr><th>Description</th><th>Quantity/Unit</th><th>Reference No.</th><th>Valuation</th><th style="width: 50px;"></th></tr></thead>
+                    <tbody>
+                        {% set mats = edit_data.materials | from_json %}
+                        {% for m in (mats if mats else [{'item':'','qty':'','ref':'','amount':''}]) %}
+                        <tr>
+                            <td><input type="text" name="mat_item[]" class="mat-input-v2 mat-row-first" value="{{ m.item }}"></td>
+                            <td><input type="text" name="mat_qty[]" class="mat-input-v2" value="{{ m.qty }}"></td>
+                            <td><input type="text" name="mat_ref[]" class="mat-input-v2" value="{{ m.ref }}"></td>
+                            <td><input type="text" name="mat_amount[]" class="mat-input-v2 mat-row-last" value="{{ m.amount }}"></td>
+                            <td class="ps-3"><button type="button" onclick="this.parentElement.parentElement.remove()" class="btn btn-sm btn-light text-danger rounded-3" style="background: var(--input-bg); border: 1px solid var(--border-bento); padding: 8px 12px;"><i class="fa-solid fa-xmark"></i></button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="button" class="btn btn-sm fw-bold px-3 py-2 mt-2 rounded-3" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: none;" onclick="addMatRow('editMatTable')"><i class="fa-solid fa-plus me-2"></i>Append Material</button>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-4 shadow-sm mb-5" style="background: var(--primary, #3b82f6); border: none;">Update Final Log</button>
+    </form>
+</div>
+
+{% else %}
+    <!-- V2 TECHNICAL WORKFLOW STEPPER -->
+    <div class="row g-3 mb-4 fade-in">
+        <div class="col-md-4">
+            <div class="step-card">
+                <div class="step-badge c-blue">1</div>
+                <h6 class="fw-800 small mb-1" style="color: var(--text-primary);">TECH CODING</h6>
+                <p class="small mb-0 fw-600" style="color: var(--text-secondary);">Technician logs root cause and material usage.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="step-card">
+                <div class="step-badge c-purple">2</div>
+                <h6 class="fw-800 small mb-1" style="color: var(--text-primary);">VERIFICATION</h6>
+                <p class="small mb-0 fw-600" style="color: var(--text-secondary);">IT Supervisor reviews data accuracy and sign-off.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="step-card">
+                <div class="step-badge c-green">3</div>
+                <h6 class="fw-800 small mb-1" style="color: var(--text-primary);">ASSET AUDIT</h6>
+                <p class="small mb-0 fw-600" style="color: var(--text-secondary);">Final inventory verification by Asset Dept.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- V2 SEGMENTED TABS -->
+    <div class="segmented-control" id="ierBTabs" role="tablist">
+        <button class="seg-tab active" data-bs-toggle="tab" data-bs-target="#create-tab">
+            <i class="fa-solid fa-file-signature"></i> Create Report
+        </button>
+        <button class="seg-tab" data-bs-toggle="tab" data-bs-target="#archive-tab">
+            <i class="fa-solid fa-clock-rotate-left"></i> Technical History
+        </button>
+    </div>
+
+    <div class="tab-content fade-in">
+        <div class="tab-pane fade show active" id="create-tab">
+            <form method="POST">
+                <!-- 01. General Identification -->
+                <div class="form-section-v2">
+                    <span class="section-header-v2">01. General Identification</span>
+                    <div class="row g-3">
+                        <div class="col-md-3"><label class="form-label-v2">Log No. *</label><input type="text" name="ier_no" class="form-control-v2 shadow-none" placeholder="IT26-REC-01" required></div>
+                        <div class="col-md-3"><label class="form-label-v2">Ref Form A No.</label><input type="text" name="ref_ier_a_no" class="form-control-v2 shadow-none" placeholder="SMP26-01"></div>
+                        <div class="col-md-3"><label class="form-label-v2">Date Reported</label><input type="date" name="date_reported" class="form-control-v2 shadow-none"></div>
+                        <div class="col-md-3"><label class="form-label-v2">Position/Title</label><input type="text" name="position_title" class="form-control-v2 shadow-none" placeholder="e.g. Technician"></div>
+                        <div class="col-md-6"><label class="form-label-v2">Employee Full Name</label><input type="text" name="employee_name" class="form-control-v2 shadow-none" placeholder="e.g. John Doe"></div>
+                        <div class="col-md-6"><label class="form-label-v2">Unit Description</label><input type="text" name="item_description" class="form-control-v2 shadow-none" placeholder="e.g. System Storage Unit"></div>
+                    </div>
+                </div>
+
+                <!-- 02. Analysis & Signatures -->
+                <div class="form-section-v2">
+                    <span class="section-header-v2">02. Root Cause & Biometric Routing</span>
+                    <div class="row g-4">
+                        <div class="col-md-6"><label class="form-label-v2">Asset Code</label><input type="text" name="asset_code" class="form-control-v2 shadow-none" placeholder="CCI-000"></div>
+                        <div class="col-md-6"><label class="form-label-v2">Endorsee</label><input type="text" name="endorsee" class="form-control-v2 shadow-none" placeholder="Responsible Employee"></div>
+                        <div class="col-12"><label class="form-label-v2">Root Cause Analysis</label><textarea name="cause_issue" class="form-control-v2 shadow-none" rows="3" placeholder="Provide root cause assessment details..."></textarea></div>
+
+                        <div class="col-md-4">
+                            <label class="form-label-v2">Prepared By *</label>
+                            <select name="prepared_by_id" class="form-control-v2 shadow-none" required>
+                                <option value="" selected disabled>Select Technician...</option>
+                                {% for u in it_staff %}<option value="{{ u.user_id }}">{{ u.full_name }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-v2">Technical Supervisor *</label>
+                            <select name="noted_by_id" class="form-control-v2 shadow-none" required>
+                                <option value="" selected disabled>Select Supervisor...</option>
+                                {% for u in it_staff %}<option value="{{ u.user_id }}">{{ u.full_name }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label-v2">Asset Department Approval *</label>
+                            <select name="received_by_id" class="form-control-v2 shadow-none" required>
+                                <option value="" selected disabled>Select Admin...</option>
+                                {% for u in all_users %}<option value="{{ u.user_id }}">{{ u.username }}</option>{% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 03. Materials -->
+                <div class="form-section-v2">
+                    <span class="section-header-v2">03. Required Spares & Materials</span>
+                    <div class="table-responsive">
+                        <table class="mat-grid-table" id="matTable">
+                            <thead><tr><th>Description</th><th>Quantity</th><th>Reference</th><th>Amount</th><th style="width: 50px;"></th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="text" name="mat_item[]" class="mat-input-v2 mat-row-first shadow-none" placeholder="Part description"></td>
+                                    <td><input type="text" name="mat_qty[]" class="mat-input-v2 shadow-none" placeholder="e.g. 1 unit"></td>
+                                    <td><input type="text" name="mat_ref[]" class="mat-input-v2 shadow-none" placeholder="PO-000"></td>
+                                    <td><input type="text" name="mat_amount[]" class="mat-input-v2 mat-row-last shadow-none" placeholder="0.00"></td>
+                                    <td class="ps-3"><button type="button" onclick="this.parentElement.parentElement.remove()" class="btn btn-sm btn-light text-danger rounded-3" style="background: var(--input-bg); border: 1px solid var(--border-bento); padding: 8px 12px;"><i class="fa-solid fa-xmark"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" class="btn btn-sm fw-bold px-3 py-2 mt-2 rounded-3" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: none;" onclick="addMatRow('matTable')"><i class="fa-solid fa-plus me-2"></i>Add Line Item</button>
+                </div>
+
+                <div class="text-end mb-5">
+                    <button type="submit" class="btn btn-primary fw-800 px-5 py-3 rounded-4 shadow-sm" style="background: var(--primary, #3b82f6); border: none;">
+                        Save Technical Report <i class="fa-solid fa-cloud-arrow-up ms-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TAB: ARCHIVE -->
+        <div class="tab-pane fade" id="archive-tab">
+            <div class="data-table-bento">
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="px-4" style="padding-left: 25px !important;">IER-B Reference</th>
+                                <th>Tech Lead</th>
+                                <th>Timestamp</th>
+                                <th class="text-end px-4" style="padding-right: 25px !important;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in forms %}
+                            <tr>
+                                <td class="py-4 px-4" style="padding-left: 25px !important;">
+                                    <span class="ier-ref">{{ f.ier_no }}</span>
+                                    <div class="small mt-2 fw-bold" style="color: var(--text-secondary);">{{ f.employee_name }}</div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-sm" style="width: 26px; height: 26px; font-size: 0.7rem; background: rgba(20, 184, 166, 0.15); color: #0d9488;">{{ f.prepared_by_name[0]|upper if f.prepared_by_name else '?' }}</div>
+                                        <div class="small fw-800" style="color: var(--text-primary);">{{ f.prepared_by_name or 'Unassigned' }}</div>
+                                    </div>
+                                </td>
+                                <td class="small fw-bold" style="color: var(--text-secondary);">{{ f.created_at.strftime('%Y-%m-%d %H:%M') if f.created_at else 'Recent' }}</td>
+                                <td class="text-end px-4" style="padding-right: 25px !important;">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="{{ url_for('print_ier_b', id=f.id) }}" target="_blank" class="icon-box c-blue" style="width: 38px; height: 38px; border-radius: 10px;">
+                                            <i class="fa-solid fa-print"></i>
+                                        </a>
+                                        {% if session.get('user_role', '').lower() == 'super admin' %}
+                                        <a href="{{ url_for('ier_b', edit_id=f.id) }}" class="icon-box c-orange ajax-link" style="width: 38px; height: 38px; border-radius: 10px;">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center py-5 fw-bold" style="color: var(--text-tertiary);">No technical investigations archived.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<script>
+    function addMatRow(tableId) {
+        const row = `<tr>
+            <td><input type="text" name="mat_item[]" class="mat-input-v2 mat-row-first shadow-none" placeholder="Part description"></td>
+            <td><input type="text" name="mat_qty[]" class="mat-input-v2 shadow-none" placeholder="e.g. 1 unit"></td>
+            <td><input type="text" name="mat_ref[]" class="mat-input-v2 shadow-none" placeholder="PO-000"></td>
+            <td><input type="text" name="mat_amount[]" class="mat-input-v2 mat-row-last shadow-none" placeholder="0.00"></td>
+            <td class="ps-3"><button type="button" onclick="this.parentElement.parentElement.remove()" class="btn btn-sm btn-light text-danger rounded-3" style="background: var(--input-bg); border: 1px solid var(--border-bento); padding: 8px 12px;"><i class="fa-solid fa-xmark"></i></button></td>
+        </tr>`;
+        document.querySelector(`#${tableId} tbody`).insertAdjacentHTML('beforeend', row);
+    }
+</script>
+{% endblock %}

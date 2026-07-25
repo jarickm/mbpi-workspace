@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .page-title { font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+
+    .guide-label { font-size: 0.7rem; font-weight: 900; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; display: block; }
+
+    .ticket-card { background: white; border-radius: 24px; padding: 40px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+
+    .form-label-custom { font-size: 0.75rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+
+    .form-control-custom, .form-select-custom {
+        background: #f8fafc; border: 2px solid #f1f5f9; border-radius: 14px;
+        padding: 12px 18px; font-weight: 600; color: #1e293b; transition: 0.3s;
+    }
+    .form-control-custom:focus, .form-select-custom:focus {
+        background: white; border-color: #4f46e5; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.05); outline: none;
+    }
+
+    /* MBPI Paper Form Inspired Radio Group */
+    .support-type-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        background: #f8fafc;
+        padding: 15px;
+        border-radius: 18px;
+        border: 2px solid #f1f5f9;
+    }
+    .support-option {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 0.85rem;
+    }
+    .support-option:hover { border-color: var(--primary); background: #f0f7ff; }
+    .form-check-input:checked + .support-option {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-submit-ticket {
+        background: linear-gradient(135deg, #002e5d 0%, #001a35 100%);
+        color: white; border: none; border-radius: 16px; padding: 16px 40px;
+        font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+        transition: 0.4s; box-shadow: 0 10px 20px rgba(0, 46, 93, 0.15);
+    }
+    .btn-submit-ticket:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(0, 46, 93, 0.25); color: white; }
+
+    .approval-section { background-color: #eef2ff; border: 1px solid #c7d2fe; border-radius: 16px; padding: 20px; margin-top: 15px; }
+</style>
+
+<div class="mb-4">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-1"><li class="breadcrumb-item small">Workspace</li><li class="breadcrumb-item small active">New Service Request</li></ol></nav>
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="page-title m-0">Masterbatch IT Work Order</h2>
+            <p class="text-muted small fw-bold">FM00214A Digital Integration</p>
+        </div>
+        <div class="badge bg-primary text-white px-3 py-2 rounded-pill fw-800"><i class="fa-solid fa-clock me-1"></i> Auto-logging Timestamp</div>
+    </div>
+</div>
+
+<div class="ticket-card shadow-sm">
+    <form action="{{ url_for('submit_ticket') }}" method="POST" enctype="multipart/form-data">
+
+        <!-- STEP 1: ROUTING -->
+        <label class="guide-label">1. Select Recipient Personnel</label>
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <label class="form-label-custom">Target Department *</label>
+                <select name="target_department" id="dept_select" class="form-select-custom w-100" required>
+                    <option value="" disabled selected>-- Select Receiving Dept --</option>
+                    {% for dept in depts %}
+                        <option value="{{ dept }}">{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-4" id="user_container">
+                <label class="form-label-custom">Recipient Personnel *</label>
+                <select name="assigned_it" id="user_select" class="form-select-custom w-100" required disabled>
+                    <option value="">Select Department First</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label-custom">Your Department (Origin)</label>
+                <input type="text" class="form-control-custom w-100 bg-light" value="{{ session.get('user_department', 'General') }}" readonly>
+            </div>
+        </div>
+
+        <!-- STEP 2: MBPI WORK ORDER SPECIFICS -->
+        <label class="guide-label">2. Work Order Details (Paper Form Integration)</label>
+        <div class="mb-4">
+            <label class="form-label-custom">Support Type Needed *</label>
+            <div class="support-type-grid">
+                <label class="m-0">
+                    <input type="radio" name="support_type" value="Network" class="form-check-input d-none" required>
+                    <div class="support-option"><i class="fa-solid fa-wifi"></i> Network</div>
+                </label>
+                <label class="m-0">
+                    <input type="radio" name="support_type" value="Software/Program" class="form-check-input d-none">
+                    <div class="support-option"><i class="fa-solid fa-code"></i> Software</div>
+                </label>
+                <label class="m-0">
+                    <input type="radio" name="support_type" value="Hardware" class="form-check-input d-none">
+                    <div class="support-option"><i class="fa-solid fa-microchip"></i> Hardware</div>
+                </label>
+                <label class="m-0">
+                    <input type="radio" name="support_type" value="Others" class="form-check-input d-none">
+                    <div class="support-option"><i class="fa-solid fa-ellipsis"></i> Others</div>
+                </label>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <label class="form-label-custom">Ticket Type *</label>
+                <select name="ticket_type" id="type_select" class="form-select-custom w-100" required disabled>
+                    <option value="">Select Dept First</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label-custom">Work Priority *</label>
+                <select name="priority" class="form-select-custom w-100">
+                    <option value="Low">Low</option>
+                    <option value="Medium" selected>Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical (SLA 8h)</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label-custom">Follow-up Email *</label>
+                <input type="email" name="email" class="form-control-custom w-100" placeholder="user@polycolor.biz" required>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-8">
+                <label class="form-label-custom">Subject of Concern *</label>
+                <input type="text" name="subject" class="form-control-custom w-100" placeholder="Brief title for the Work Order..." required>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label-custom">Anydesk Remote ID</label>
+                <input type="text" name="anydesk_id" class="form-control-custom w-100" placeholder="000 000 000">
+            </div>
+        </div>
+
+        <!-- STEP 3: CONTENT -->
+        <label class="guide-label">3. Detailed Description of Problem</label>
+        <div class="mb-4">
+            <textarea name="description" class="form-control-custom w-100" rows="5" placeholder="Explain the technical issue or request in detail..." required></textarea>
+        </div>
+
+        <!-- ATTACHMENTS (Equivalent to Screenshots/Ref Forms) -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <label class="form-label-custom">Reference Form / Documents</label>
+                <input type="file" name="reference_form" class="form-control-custom w-100">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label-custom">Screenshot / Photo</label>
+                <input type="file" name="screenshot_photo" class="form-control-custom w-100">
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <button type="submit" class="btn btn-submit-ticket px-5">
+                Generate Digital Work Order <i class="fa-solid fa-file-signature ms-2"></i>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deptSelect = document.getElementById('dept_select');
+    const userSelect = document.getElementById('user_select');
+    const userContainer = document.getElementById('user_container');
+    const typeSelect = document.getElementById('type_select');
+
+    deptSelect.addEventListener('change', function() {
+        const deptName = this.value;
+
+        // Reset fields
+        userSelect.disabled = true;
+        userSelect.innerHTML = '<option>Loading Personnel...</option>';
+        typeSelect.disabled = true;
+
+        // Fetch Users for Recipient
+        fetch(`/api/get_users_by_dept/${encodeURIComponent(deptName)}`)
+            .then(res => res.json())
+            .then(users => {
+                userSelect.innerHTML = '<option value="" disabled selected>-- Select Recipient --</option>';
+                if (users.length === 0) {
+                    userSelect.innerHTML = '<option value="">No users found</option>';
+                } else {
+                    users.forEach(u => {
+                        userSelect.innerHTML += `<option value="${u.username}">${u.full_name}</option>`;
+                    });
+                }
+                userSelect.disabled = false;
+            });
+
+        // Fetch Ticket Types
+        fetch(`/api/get_types_by_dept/${encodeURIComponent(deptName)}`)
+            .then(res => res.json())
+            .then(types => {
+                typeSelect.innerHTML = '<option value="" disabled selected>-- Select Category --</option>';
+                types.forEach(t => {
+                    typeSelect.innerHTML += `<option value="${t.name}">${t.name}</option>`;
+                });
+                typeSelect.disabled = false;
+            });
+    });
+});
+</script>
+{% endblock %}

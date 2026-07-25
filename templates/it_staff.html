@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Overview Bar --- */
+    .overview-bar {
+        background: var(--surface-bento); border: 1px solid var(--border-bento);
+        border-radius: 20px; padding: 18px 25px; margin-bottom: 25px;
+        display: flex; align-items: center; gap: 30px; flex-wrap: wrap;
+        box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .ov-item { display: flex; align-items: center; gap: 12px; }
+    .ov-label { font-size: 0.72rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+    .ov-value { font-size: 1.25rem; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+
+    /* Overview Icons Tint */
+    .ov-item .icon-box.c-teal { background: rgba(20, 184, 166, 0.12); color: #0d9488; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+    .ov-item .icon-box.c-blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+
+    /* --- Data Table Bento --- */
+    .data-table-bento {
+        background: var(--surface-bento); border-radius: 28px; border: 1px solid var(--border-bento);
+        box-shadow: var(--card-shadow); overflow: hidden;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .table-toolbar {
+        padding: 20px 25px; border-bottom: 1px solid var(--border-bento);
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(0,0,0,0.01);
+    }
+
+    .toolbar-search {
+        background: var(--input-bg); border: 1px solid var(--border-bento);
+        border-radius: 14px; display: flex; align-items: center; padding: 0 15px; width: 280px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .toolbar-search:focus-within {
+        border-color: var(--primary, #3b82f6);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .toolbar-search input {
+        border: none; background: transparent; padding: 10px 0;
+        color: var(--text-primary); font-size: 0.85rem; font-weight: 600; width: 100%; outline: none;
+    }
+    .toolbar-search input::placeholder { color: var(--text-tertiary); }
+
+    /* ========================================= */
+    /* --- BOOTSTRAP TABLE BACKGROUND FIX --- */
+    /* ========================================= */
+    .table,
+    .table > tbody,
+    .table > tbody > tr,
+    .table > tbody > tr > td,
+    .table > thead > tr > th {
+        background-color: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-striped-bg: transparent !important;
+    }
+
+    /* Table Design */
+    .table thead th {
+        color: var(--text-tertiary); font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 1px; padding: 18px 25px; border-bottom: 1px solid var(--border-bento); font-weight: 800;
+        background: rgba(0,0,0,0.02) !important;
+    }
+    .table tbody td { padding: 18px 25px; vertical-align: middle; border-bottom: 1px solid var(--border-bento); color: var(--text-primary); font-size: 0.95rem; }
+    .table tbody tr { transition: background-color 0.25s ease; }
+    .table tbody tr:hover { background-color: var(--row-hover-bg) !important; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* Personnel Specific UI */
+    .id-tag-v2 {
+        font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 0.82rem;
+        background: var(--input-bg); color: var(--primary, #3b82f6); padding: 5px 12px;
+        border-radius: 8px; border: 1px solid var(--border-bento);
+    }
+
+    .avatar-v2 {
+        width: 44px; height: 44px;
+        background: linear-gradient(135deg, #14b8a6 0%, var(--primary, #3b82f6) 100%);
+        color: white; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(20, 184, 166, 0.15);
+    }
+    .system-avatar { background: linear-gradient(135deg, #64748b, #475569) !important; box-shadow: none !important; opacity: 0.8; }
+
+    /* Soft UI Pills */
+    .status-pill-v2 {
+        padding: 6px 12px; border-radius: 8px; font-size: 0.7rem;
+        font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+        display: inline-block;
+    }
+    .s-active { background: rgba(16, 185, 129, 0.15); color: #059669; }
+    .s-system { background: var(--input-bg); color: var(--text-secondary); border: 1px solid var(--border-bento); }
+
+    body.dark-mode .s-active { color: #34d399; }
+
+    /* Sidebar Form */
+    .sticky-sidebar { position: sticky; top: 20px; }
+
+    .form-bento {
+        background: var(--surface-bento); border-radius: 28px; border: 1px solid var(--border-bento);
+        padding: 30px; box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .form-label-v2 { font-size: 0.75rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+
+    .form-control-v2 {
+        background: var(--input-bg); border: 1px solid var(--border-bento);
+        border-radius: 14px; padding: 14px 15px; color: var(--text-primary);
+        font-weight: 600; width: 100%; transition: all 0.3s; font-size: 0.9rem;
+    }
+    .form-control-v2:focus { border-color: var(--primary, #3b82f6); outline: none; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+    .form-control-v2::placeholder { color: var(--text-tertiary); }
+
+    .btn-create-v2 {
+        background: var(--primary, #3b82f6); color: white !important; border: none; border-radius: 16px;
+        padding: 16px; font-weight: 800; width: 100%; transition: all 0.2s ease;
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-create-v2:hover { transform: translateY(-3px); background: #1d4ed8; }
+
+    .tip-box {
+        background: rgba(59, 130, 246, 0.08); border: 1px dashed rgba(59, 130, 246, 0.3);
+        border-radius: 18px; padding: 20px; margin-top: 25px;
+    }
+
+    /* ========================================= */
+    /* --- BROWSER DROPDOWN VISIBILITY FIX --- */
+    /* ========================================= */
+    select option {
+        background-color: var(--surface-bento) !important;
+        color: var(--text-primary) !important;
+    }
+
+    .icon-box.c-teal {
+        background: rgba(20, 184, 166, 0.12);
+        color: #0d9488;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<!-- Header -->
+<div class="mb-4 mt-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">Management</li>
+            <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">IT Personnel</li>
+        </ol>
+    </nav>
+    <h2 class="page-title m-0">Technical Roster</h2>
+</div>
+
+<!-- Specialist Overview Bar -->
+<div class="overview-bar shadow-sm">
+    <div class="ov-item">
+        <div class="icon-box c-teal" style="width: 32px; height: 32px; font-size: 0.8rem;"><i class="fa-solid fa-user-tie"></i></div>
+        <div>
+            <div class="ov-label">Technical Specialists</div>
+            <div class="ov-value">{{ staff|length }}</div>
+        </div>
+    </div>
+    <div class="ov-item border-start ps-4" style="border-color: var(--border-bento) !important;">
+        <div class="icon-box c-blue" style="width: 32px; height: 32px; font-size: 0.8rem; background: rgba(59, 130, 246, 0.12); color: #3b82f6;"><i class="fa-solid fa-user-check"></i></div>
+        <div>
+            <div class="ov-label">Status</div>
+            <div class="ov-value" style="color: var(--text-primary);">Operational</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- PERSONNEL TABLE -->
+    <div class="col-lg-7">
+        <div class="data-table-bento">
+            <div class="table-toolbar" style="border-color: var(--border-bento) !important;">
+                <div class="toolbar-search">
+                    <i class="fa-solid fa-magnifying-glass" style="color: var(--text-tertiary);"></i>
+                    <input type="text" id="staffSearch" placeholder="Search specialists..." onkeyup="filterStaff()">
+                </div>
+                <div class="small fw-800" style="color: var(--text-secondary);">Active Roster</div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-borderless align-middle mb-0" id="staffTable">
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Reference</th>
+                            <th>Specialist Name</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in staff %}
+                        <tr>
+                            <td class="ps-4"><span class="id-tag-v2">#{{ s.id }}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-v2 {% if s.it_name == 'Any Available IT' %}system-avatar{% endif %} shadow-sm">
+                                        {{ s.it_name[0] | upper }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-800" style="font-size: 1rem; color: var(--text-primary);">{{ s.it_name }}</div>
+                                        {% if s.it_name == 'Any Available IT' %}
+                                            <span class="status-pill-v2 s-system"><i class="fa-solid fa-shield-halved me-1"></i> System Default</span>
+                                        {% else %}
+                                            <span class="status-pill-v2 s-active">Active specialist</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end pe-4">
+                                {% if s.it_name != 'Any Available IT' %}
+                                <form method="POST" onsubmit="return confirm('Permanently remove this specialist from the technical roster?');" class="d-inline">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="{{ s.id }}">
+                                    <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100"><i class="fa-solid fa-user-minus"></i></button>
+                                </form>
+                                {% else %}
+                                    <div class="me-2 opacity-25" style="color: var(--text-tertiary);"><i class="fa-solid fa-lock"></i></div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-center py-5 fw-bold" style="color: var(--text-tertiary);">No technical personnel found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ONBOARDING SIDEBAR -->
+    <div class="col-lg-5">
+        <div class="sticky-sidebar">
+            <div class="form-bento">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="icon-box c-teal" style="width: 48px; height: 48px; border-radius: 14px; font-size: 1.2rem;">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-800 m-0" style="color: var(--text-primary);">Onboard Specialist</h5>
+                        <p class="small fw-bold mb-0" style="color: var(--text-secondary);">Register technical node</p>
+                    </div>
+                </div>
+
+                <form method="POST">
+                    <input type="hidden" name="action" value="add">
+
+                    <div class="mb-4">
+                        <label class="form-label-v2">Full Name & Technical Designation *</label>
+                        <input type="text" name="name" class="form-control-v2 shadow-none" placeholder="e.g. John Doe (System Admin)" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-create-v2">
+                        Deploy Specialist <i class="fa-solid fa-bolt-lightning ms-2" style="font-size: 0.8rem;"></i>
+                    </button>
+                </form>
+
+                <div class="tip-box">
+                    <div class="d-flex gap-3">
+                        <i class="fa-solid fa-circle-info mt-1" style="color: var(--primary, #3b82f6); font-size: 1.15rem;"></i>
+                        <div>
+                            <h6 class="fw-800 mb-1" style="color: var(--primary, #3b82f6); font-size: 0.85rem;">Role Integration:</h6>
+                            <p class="small mb-0 fw-600" style="font-size: 0.75rem; color: var(--text-secondary);">Personnel registered here will appear in the <strong>Assigned Handler</strong> dropdowns across all departmental dashboards.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Real-time Staff Filtering
+    function filterStaff() {
+        let input = document.getElementById('staffSearch');
+        let filter = input.value.toUpperCase();
+        let table = document.getElementById('staffTable');
+        let tr = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < tr.length; i++) {
+            let td = tr[i].getElementsByTagName('td')[1];
+            if (td) {
+                let textValue = td.textContent || td.innerText;
+                tr[i].style.display = textValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+    }
+</script>
+{% endblock %}

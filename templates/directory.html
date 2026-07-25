@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Instructions Bar --- */
+    .instruction-bar {
+        background: var(--surface-bento);
+        border: 1px solid var(--border-bento);
+        border-radius: 20px;
+        padding: 15px 25px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .inst-item { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+    .inst-item i { color: var(--primary, #3b82f6); font-size: 0.95rem; }
+
+    /* --- Management Bento Card --- */
+    .admin-tool-box {
+        border: 2px dashed rgba(99, 102, 241, 0.3);
+        background: rgba(99, 102, 241, 0.05);
+        border-radius: 24px;
+        margin-bottom: 25px;
+        overflow: hidden;
+    }
+
+    /* --- Unified Data Table --- */
+    .data-table-bento {
+        background: var(--surface-bento);
+        border-radius: 28px;
+        border: 1px solid var(--border-bento);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .table-toolbar {
+        padding: 20px 25px;
+        border-bottom: 1px solid var(--border-bento);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .toolbar-search {
+        background: var(--input-bg);
+        border: 1px solid var(--border-bento);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        width: 320px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .toolbar-search:focus-within {
+        border-color: var(--primary, #3b82f6);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .toolbar-search input {
+        border: none; background: transparent; padding: 10px 0;
+        color: var(--text-primary); font-size: 0.9rem; font-weight: 600; width: 100%;
+        outline: none;
+    }
+    .toolbar-search input::placeholder { color: var(--text-tertiary); }
+
+    /* ========================================= */
+    /* --- BOOTSTRAP TABLE BACKGROUND FIX --- */
+    /* ========================================= */
+    .table,
+    .table > tbody,
+    .table > tbody > tr,
+    .table > tbody > tr > td,
+    .table > thead > tr > th {
+        background-color: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-striped-bg: transparent !important;
+    }
+
+    /* Table Styling */
+    .table thead th {
+        color: var(--text-tertiary); font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 1px; padding: 18px 25px; border-bottom: 1px solid var(--border-bento); font-weight: 800;
+        background: rgba(0,0,0,0.02) !important;
+    }
+    .table tbody td { padding: 18px 25px; vertical-align: middle; border-bottom: 1px solid var(--border-bento); color: var(--text-primary); font-size: 0.9rem; }
+    .table tbody tr:hover { background-color: var(--row-hover-bg) !important; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* Directory Specific UI */
+    .avatar-v2 {
+        width: 40px; height: 40px;
+        background: linear-gradient(135deg, var(--primary, #3b82f6) 0%, #4f46e5 100%);
+        color: white; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 1rem;
+    }
+
+    .dept-badge-v2 {
+        background: rgba(59, 130, 246, 0.12); color: #3b82f6;
+        font-size: 0.7rem; padding: 6px 12px; border-radius: 8px;
+        font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    body.dark-mode .dept-badge-v2 {
+        background: rgba(96, 165, 250, 0.15); color: #60a5fa;
+    }
+
+    .btn-v2-manage {
+        background: var(--surface-bento); border: 1px solid var(--border-bento);
+        border-radius: 14px; padding: 10px 20px; font-weight: 700;
+        color: var(--text-primary); transition: all 0.2s ease;
+        text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .btn-v2-manage:hover { border-color: var(--primary, #3b82f6); color: var(--primary, #3b82f6); }
+    .btn-v2-manage.disabled { pointer-events: none; }
+
+    .form-control-v2 {
+        background: var(--input-bg); border: 1px solid var(--input-border);
+        border-radius: 12px; padding: 10px 15px; color: var(--text-primary); font-weight: 600;
+        transition: all 0.2s;
+    }
+    .form-control-v2:focus { border-color: var(--primary, #3b82f6); outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    .form-control-v2::placeholder { color: var(--text-tertiary); }
+</style>
+
+<!-- HEADER SECTION -->
+<div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-3">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">Workspace</li>
+                <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">Directory</li>
+            </ol>
+        </nav>
+        <h2 class="page-title m-0">Company Directory</h2>
+    </div>
+    {% if is_admin %}
+    <button class="btn btn-v2-manage shadow-sm" data-bs-toggle="collapse" data-bs-target="#adminControls">
+        <i class="fa-solid fa-user-gear me-2"></i> Directory Admin
+    </button>
+    {% endif %}
+</div>
+
+<!-- PROCESS INSTRUCTIONS -->
+<div class="instruction-bar shadow-sm">
+    <div class="inst-item">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span>Search by Name, ID, or Dept</span>
+    </div>
+    <div class="inst-item">
+        <i class="fa-solid fa-envelope-open-text"></i>
+        <span>Click Email to Compose</span>
+    </div>
+    <div class="inst-item">
+        <i class="fa-solid fa-copy"></i>
+        <span>Click ID to Highlight</span>
+    </div>
+</div>
+
+<!-- ADMIN CONTROLS (Bento Style) -->
+{% if is_admin %}
+<div class="collapse" id="adminControls">
+    <div class="admin-tool-box shadow-sm">
+        <div class="p-4">
+            <div class="row g-4">
+                <!-- Manual Entry -->
+                <div class="col-lg-7 border-end-md" style="border-color: var(--border-bento) !important;">
+                    <h6 class="fw-800 mb-3 text-uppercase small" style="color: #6366f1; letter-spacing: 1px;">Manual Registration</h6>
+                    <form method="POST">
+                        <input type="hidden" name="action" value="add">
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6"><input type="text" name="name" class="form-control-v2 w-100 shadow-none" placeholder="Full Name" required></div>
+                            <div class="col-md-6">
+                                <select name="dept" class="form-control-v2 w-100 shadow-none" required>
+                                    <option value="">Select Department</option>
+                                    {% for dept in depts %}<option value="{{ dept }}">{{ dept }}</option>{% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6"><input type="text" name="user" class="form-control-v2 w-100 shadow-none" placeholder="Employee ID"></div>
+                            <div class="col-md-6"><input type="email" name="email" class="form-control-v2 w-100 shadow-none" placeholder="Email Address"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary px-4 fw-bold rounded-3" style="background: var(--primary, #3b82f6); border: none;">Save to Directory</button>
+                    </form>
+                </div>
+                <!-- Excel Import with Instructions -->
+                <div class="col-lg-5 ps-lg-4">
+                    <h6 class="fw-800 mb-2 text-uppercase small" style="color: #6366f1; letter-spacing: 1px;">Bulk Import Protocol</h6>
+                    <div class="p-3 mb-3 rounded-3" style="background: var(--surface-bento); border: 1px solid var(--border-bento);">
+                        <p class="mb-1 fw-800 text-uppercase" style="font-size: 0.65rem; color: #6366f1;">Required Excel Headers:</p>
+                        <code class="small fw-bold" style="color: var(--primary, #3b82f6);">Name, Dept, ID, Email</code>
+                    </div>
+                    <form method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="action" value="import">
+                        <div class="input-group">
+                            <input type="file" name="excel_file" class="form-control-v2 shadow-none" accept=".xlsx" required style="border-radius: 12px 0 0 12px; height: 44px;">
+                            <button type="submit" class="btn btn-success fw-bold px-3" style="border-radius: 0 12px 12px 0; border: none; background: #10b981;">Process File</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- DATA TABLE BENTO -->
+<div class="data-table-bento">
+    <!-- Integrated Toolbar -->
+    <div class="table-toolbar" style="border-color: var(--border-bento) !important;">
+        <form method="GET" action="{{ url_for('directory') }}" class="toolbar-search">
+            <i class="fa-solid fa-magnifying-glass" style="color: var(--text-tertiary);"></i>
+            <input type="text" name="search" placeholder="Filter current view..." value="{{ search_query or '' }}">
+        </form>
+
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('directory') }}" class="btn-v2-manage ajax-link" title="Reset View">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-borderless align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Department</th>
+                    <th>Employee ID</th>
+                    <th>Email Address</th>
+                    {% if is_admin %}<th class="text-end" style="padding-right: 25px;">Action</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in emps %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-v2 shadow-sm">{{ e.name[0] | upper }}</div>
+                            <div class="fw-800" style="color: var(--text-primary);">{{ e.name }}</div>
+                        </div>
+                    </td>
+                    <td><span class="dept-badge-v2">{{ e.department }}</span></td>
+                    <td>
+                        <span class="fw-bold small user-select-all" style="color: var(--text-secondary);" title="Click to select">{{ e.username }}</span>
+                    </td>
+                    <td>
+                        <a href="mailto:{{ e.email }}" class="text-decoration-none fw-800 small d-flex align-items-center gap-2" style="color: var(--primary, #3b82f6);">
+                            <i class="fa-regular fa-envelope opacity-70"></i>{{ e.email }}
+                        </a>
+                    </td>
+                    {% if is_admin %}
+                    <td class="text-end" style="padding-right: 25px;">
+                        <form method="POST" onsubmit="return confirm('Archive this record?');" class="d-inline">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="id" value="{{ e.id }}">
+                            <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </form>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <div class="py-4">
+                            <i class="fa-solid fa-users-slash mb-3 opacity-25" style="font-size: 3rem; color: var(--text-tertiary);"></i>
+                            <h5 class="fw-bold" style="color: var(--text-primary);">No records found</h5>
+                            <p class="small mb-3" style="color: var(--text-secondary);">Adjust your search criteria.</p>
+                            <a href="{{ url_for('directory') }}" class="btn btn-v2-manage ajax-link">Reset Directory</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- V2 PAGINATION -->
+{% if pagination.pages > 1 %}
+<div class="d-flex justify-content-center align-items-center gap-2 mt-4 mb-5">
+    <a href="{{ url_for('directory', page=pagination.prev_num, search=search_query) }}"
+       class="btn-v2-manage ajax-link {% if not pagination.has_prev %}disabled opacity-25{% endif %}">
+        <i class="fa-solid fa-chevron-left"></i>
+    </a>
+
+    <div class="px-3 py-2 fw-800 small" style="background: var(--surface-bento); border: 1px solid var(--border-bento); border-radius: 12px; color: var(--text-primary);">
+        {{ pagination.page }} <span class="mx-1" style="color: var(--text-tertiary); font-weight: normal;">/</span> {{ pagination.pages }}
+    </div>
+
+    <a href="{{ url_for('directory', page=pagination.next_num, search=search_query) }}"
+       class="btn-v2-manage ajax-link {% if not pagination.has_next %}disabled opacity-25{% endif %}">
+        <i class="fa-solid fa-chevron-right"></i>
+    </a>
+</div>
+{% endif %}
+
+{% endblock %}

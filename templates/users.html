@@ -1,0 +1,505 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Access Overview Bar --- */
+    .overview-bar {
+        background: var(--surface-bento); border: 1px solid var(--border-bento);
+        border-radius: 20px; padding: 18px 25px; margin-bottom: 25px;
+        display: flex; align-items: center; gap: 30px; flex-wrap: wrap;
+        box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .ov-item { display: flex; align-items: center; gap: 12px; }
+    .ov-label { font-size: 0.72rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+    .ov-value { font-size: 1.25rem; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+
+    /* Overview Icons Tint */
+    .ov-item .icon-box.c-blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+    .ov-item .icon-box.c-red { background: rgba(239, 68, 68, 0.12); color: #ef4444; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+
+    /* --- Data Table Bento --- */
+    .data-table-bento {
+        background: var(--surface-bento); border-radius: 28px; border: 1px solid var(--border-bento);
+        box-shadow: var(--card-shadow); overflow: hidden;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .table-toolbar {
+        padding: 20px 25px; border-bottom: 1px solid var(--border-bento);
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(0,0,0,0.01); gap: 15px; flex-wrap: wrap;
+    }
+
+    .toolbar-search {
+        background: var(--input-bg); border: 1px solid var(--border-bento);
+        border-radius: 14px; display: flex; align-items: center; padding: 0 15px; width: 300px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .toolbar-search:focus-within {
+        border-color: var(--primary, #3b82f6);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .toolbar-search input {
+        border: none; background: transparent; padding: 10px 0;
+        color: var(--text-primary); font-size: 0.9rem; font-weight: 600; width: 100%; outline: none;
+    }
+    .toolbar-search input::placeholder { color: var(--text-tertiary); }
+
+    /* ========================================= */
+    /* --- BOOTSTRAP TABLE BACKGROUND FIX --- */
+    /* ========================================= */
+    .table,
+    .table > tbody,
+    .table > tbody > tr,
+    .table > tbody > tr > td,
+    .table > thead > tr > th {
+        background-color: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-striped-bg: transparent !important;
+    }
+
+    /* Table Design */
+    .table thead th {
+        color: var(--text-tertiary); font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 1px; padding: 18px 25px; border-bottom: 1px solid var(--border-bento); font-weight: 800;
+        background: rgba(0,0,0,0.02) !important;
+    }
+    .table tbody td { padding: 18px 25px; vertical-align: middle; border-bottom: 1px solid var(--border-bento); color: var(--text-primary); font-size: 0.9rem; }
+    .table tbody tr { transition: background-color 0.25s ease; }
+    .table tbody tr:hover { background-color: var(--row-hover-bg) !important; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* Better Checkboxes */
+    .v2-checkbox {
+        width: 18px; height: 18px; border-radius: 6px; border: 2px solid var(--text-tertiary);
+        background-color: transparent; cursor: pointer; transition: all 0.2s; margin-top: 0; opacity: 1 !important;
+    }
+    .v2-checkbox:checked { background-color: var(--primary, #3b82f6); border-color: var(--primary, #3b82f6); }
+
+    /* V2 Role Pills */
+    .role-pill-v2 {
+        padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800;
+        text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;
+    }
+    .r-super { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .r-admin { background: rgba(79, 70, 229, 0.15); color: #4f46e5; }
+    .r-it { background: rgba(20, 184, 166, 0.15); color: #0d9488; }
+    .r-manager { background: rgba(249, 115, 22, 0.15); color: #ea580c; }
+    .r-user { background: var(--input-bg); color: var(--text-secondary); border: 1px solid var(--border-bento); }
+
+    body.dark-mode .r-super { color: #f87171; }
+    body.dark-mode .r-admin { color: #818cf8; }
+    body.dark-mode .r-manager { color: #fb923c; }
+
+    /* Action Buttons */
+    .btn-action-v2 {
+        width: 38px; height: 38px; border-radius: 10px; display: inline-flex; align-items: center;
+        justify-content: center; transition: all 0.2s ease; border: 1px solid var(--border-bento);
+        background: var(--input-bg); color: var(--text-primary); text-decoration: none; padding: 0;
+    }
+    .btn-action-v2:hover { border-color: var(--primary, #3b82f6); color: var(--primary, #3b82f6); transform: translateY(-2px); }
+    .btn-delete-v2:hover { border-color: #ef4444; color: #ef4444 !important; }
+
+    /* Sidebar Form */
+    .sticky-sidebar { position: sticky; top: 20px; }
+
+    .form-bento {
+        background: var(--surface-bento); border-radius: 28px; border: 1px solid var(--border-bento);
+        padding: 30px; box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .form-label-v2 { font-size: 0.75rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+
+    .form-control-v2 {
+        background: var(--input-bg); border: 1px solid var(--border-bento);
+        border-radius: 14px; padding: 12px 15px; color: var(--text-primary);
+        font-weight: 600; width: 100%; transition: all 0.3s; font-size: 0.9rem;
+    }
+    .form-control-v2:focus { border-color: var(--primary, #3b82f6); outline: none; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+    .form-control-v2::placeholder { color: var(--text-tertiary); }
+
+    .btn-create-v2 {
+        background: var(--primary, #3b82f6); color: white !important; border: none; border-radius: 16px;
+        padding: 16px; font-weight: 800; width: 100%; transition: all 0.2s ease;
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-create-v2:hover { transform: translateY(-2px); background: #1d4ed8; }
+
+    /* Bulk Tool Extension */
+    .bulk-action-node {
+        background: var(--input-bg); border-top: 1px solid var(--border-bento);
+        padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    }
+
+    /* Modal Styling Aligned with Dashboard */
+    .modal-content { border-radius: 28px; border: 1px solid var(--border-bento); background: var(--surface-bento); color: var(--text-primary); }
+    .v2-modal-header { border-bottom: 1px solid var(--border-bento); padding: 1.5rem 2rem; }
+    .modal-backdrop.show { opacity: 0.4; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); background-color: #0f172a; }
+
+    /* ========================================= */
+    /* --- BROWSER DROPDOWN VISIBILITY FIX --- */
+    /* ========================================= */
+    select option {
+        background-color: var(--surface-bento) !important;
+        color: var(--text-primary) !important;
+    }
+
+    .icon-box.c-purple {
+        background: rgba(168, 85, 247, 0.12);
+        color: #a855f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<!-- Header -->
+<div class="mb-4 mt-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">System Administration</li>
+            <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">Personnel Control</li>
+        </ol>
+    </nav>
+    <h2 class="page-title m-0">User Management</h2>
+</div>
+
+<!-- Access Overview Bar -->
+<div class="overview-bar shadow-sm">
+    <div class="ov-item">
+        <div class="icon-box c-blue" style="width: 32px; height: 32px; font-size: 0.8rem;"><i class="fa-solid fa-users"></i></div>
+        <div>
+            <div class="ov-label">Total Personnel</div>
+            <div class="ov-value">{{ user_list|length }}</div>
+        </div>
+    </div>
+    <div class="ov-item border-start ps-4" style="border-color: var(--border-bento) !important;">
+        <div class="icon-box c-red" style="width: 32px; height: 32px; font-size: 0.8rem;"><i class="fa-solid fa-shield-halved"></i></div>
+        <div>
+            <div class="ov-label">Admin Privileges</div>
+            <div class="ov-value">{{ user_list|selectattr('role', 'equalto', 'Admin')|list|length + user_list|selectattr('role', 'equalto', 'Super Admin')|list|length }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- USER TABLE -->
+    <div class="col-lg-8">
+        <div class="data-table-bento">
+            <!-- Integrated Search Toolbar -->
+            <div class="table-toolbar">
+                <form id="userSearchForm" method="GET" action="{{ url_for('users') }}" class="toolbar-search">
+                    <i class="fa-solid fa-magnifying-glass" style="color: var(--text-tertiary);"></i>
+                    <input type="text" name="search" placeholder="Search by name, email, or role..." value="{{ search_query or '' }}">
+                </form>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('users') }}" class="btn-action-v2 ajax-link" title="Reload List"><i class="fa-solid fa-arrows-rotate"></i></a>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-borderless align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th class="ps-4" style="width: 40px;"><input type="checkbox" class="v2-checkbox" id="selectAllCheckbox"></th>
+                            <th>User Identity</th>
+                            <th>Permission Tier</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in user_list %}
+                        <tr>
+                            <td class="ps-4"><input type="checkbox" class="v2-checkbox user-checkbox" value="{{ u.user_id }}"></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-sm" style="width: 42px; height: 42px; background: linear-gradient(135deg, var(--primary, #3b82f6) 0%, #4338ca 100%); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem;">
+                                        {{ u.username[0] | upper }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-800" style="font-size: 0.95rem; color: var(--text-primary);">{{ u.full_name or u.username }}</div>
+                                        <div class="small fw-bold" style="font-size: 0.75rem; color: var(--text-secondary);">{{ u.email or 'No email provided' }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="role-pill-v2
+                                    {% if 'super' in u.role|lower %}r-super
+                                    {% elif 'admin' in u.role|lower %}r-admin
+                                    {% elif 'it' in u.role|lower %}r-it
+                                    {% elif 'manager' in u.role|lower %}r-manager
+                                    {% else %}r-user{% endif %}">
+                                    {{ u.role }}
+                                </span>
+                                <div class="small fw-800 mt-1 opacity-50" style="font-size: 0.7rem; color: var(--text-tertiary);">{{ u.department or 'ROOT' }}</div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <button type="button" class="btn-action-v2 shadow-none me-1"
+                                        data-id="{{ u.user_id }}" data-username="{{ u.username }}"
+                                        data-fullname="{{ u.full_name or '' }}" data-email="{{ u.email or '' }}"
+                                        data-role="{{ u.role }}" data-department="{{ u.department or '' }}"
+                                        onclick="openEditModal(this)">
+                                    <i class="fa-solid fa-user-pen"></i>
+                                </button>
+                                {% if u.user_id != session['user_id'] %}
+                                <form method="POST" onsubmit="return confirm('Archive this user node?');" class="d-inline">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="{{ u.user_id }}">
+                                    <button type="submit" class="btn-action-v2 btn-delete-v2 shadow-none"><i class="fa-solid fa-trash-can"></i></button>
+                                </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bulk Assignment Node -->
+            <div class="bulk-action-node">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-people-arrows" style="color: var(--primary, #3b82f6);"></i>
+                    <span class="small fw-800" style="color: var(--text-secondary);">Bulk Dept. Assignment</span>
+                </div>
+                <form action="{{ url_for('bulk_assign_dept') }}" method="POST" id="bulkAssignForm" class="d-flex gap-2 align-items-center">
+                    <select name="target_department" class="form-control-v2 py-1 px-3 shadow-none" style="width: 200px; height: 38px; font-size: 0.8rem;" required>
+                        <option value="">Target Dept...</option>
+                        {% for d in depts %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary fw-bold px-3 shadow-none" style="background: var(--primary, #3b82f6); border: none; height: 38px; border-radius: 10px; font-size: 0.8rem;">Update</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- V2 Pagination -->
+        {% if pagination and pagination.pages > 1 %}
+        <div class="d-flex justify-content-center align-items-center gap-2 mt-4">
+            <a href="{{ url_for('users', page=pagination.prev_num, search=search_query) }}"
+               class="btn-action-v2 ajax-link {% if not pagination.has_prev %}disabled opacity-25{% endif %}">
+               <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            <div class="px-3 py-2 fw-800 small" style="background: var(--surface-bento); border: 1px solid var(--border-bento); border-radius: 12px; color: var(--text-primary);">
+                {{ pagination.page }} <span class="mx-1" style="color: var(--text-tertiary); font-weight: normal;">/</span> {{ pagination.pages }}
+            </div>
+            <a href="{{ url_for('users', page=pagination.next_num, search=search_query) }}"
+               class="btn-action-v2 ajax-link {% if not pagination.has_next %}disabled opacity-25{% endif %}">
+               <i class="fa-solid fa-chevron-right"></i>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- REGISTER SIDEBAR -->
+    <div class="col-lg-4">
+        <div class="sticky-sidebar">
+            <div class="form-bento">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="icon-box c-purple" style="width: 48px; height: 48px; border-radius: 14px; font-size: 1.2rem;">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-800 m-0" style="color: var(--text-primary);">Register User</h5>
+                        <p class="small fw-bold mb-0" style="color: var(--text-secondary);">Append personnel node</p>
+                    </div>
+                </div>
+
+                <form method="POST">
+                    <input type="hidden" name="action" value="add">
+                    <div class="mb-3"><label class="form-label-v2">Username *</label><input type="text" name="username" class="form-control-v2 shadow-none" placeholder="e.g. jdoe" required></div>
+                    <div class="mb-3"><label class="form-label-v2">Full Name</label><input type="text" name="full_name" class="form-control-v2 shadow-none" placeholder="e.g. John Doe"></div>
+                    <div class="mb-3"><label class="form-label-v2">Email</label><input type="email" name="email" class="form-control-v2 shadow-none" placeholder="name@coolaire.com"></div>
+                    <div class="mb-3"><label class="form-label-v2">Initial Password *</label><input type="password" name="password" class="form-control-v2 shadow-none" placeholder="••••••••" required></div>
+                    <div class="row g-2 mb-4">
+                        <div class="col-6">
+                            <label class="form-label-v2">Access Role</label>
+                            <select name="role" class="form-control-v2 shadow-none">
+                                <option>User</option><option>Manager</option><option>Asset Manager</option><option>Auditor</option><option>IT Support</option><option>Admin</option><option>Super Admin</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label-v2">Dept.</label>
+                            <select name="department" class="form-control-v2 shadow-none">
+                                <option value="">None</option>
+                                {% for d in depts %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-create-v2">Deploy Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="v2-modal-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="icon-box c-blue" style="width: 40px; height: 40px; border-radius: 10px; background: rgba(59, 130, 246, 0.15);"><i class="fa-solid fa-user-gear"></i></div>
+                    <h5 class="fw-800 m-0" style="color: var(--text-primary);">Modify Account</h5>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" style="filter: var(--close-btn-filter);"></button>
+            </div>
+            <form method="POST">
+                <div class="modal-body p-4">
+                    <input type="hidden" name="action" value="edit">
+                    <input type="hidden" name="id" id="edit_user_id">
+                    <div class="row g-3">
+                        <div class="col-12"><label class="form-label-v2">Username</label><input type="text" name="username" id="edit_username" class="form-control-v2 shadow-none" required></div>
+                        <div class="col-md-6"><label class="form-label-v2">Full Name</label><input type="text" name="full_name" id="edit_full_name" class="form-control-v2 shadow-none"></div>
+                        <div class="col-md-6"><label class="form-label-v2">Email</label><input type="email" name="email" id="edit_email" class="form-control-v2 shadow-none"></div>
+                        <div class="col-6">
+                            <label class="form-label-v2">Permission Tier</label>
+                            <select name="role" id="edit_role" class="form-control-v2 shadow-none">
+                                <option>User</option><option>Manager</option><option>IT Support</option><option>Admin</option><option>Super Admin</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                           <label class="form-label-v2">Dept. Node</label>
+                           <select name="department" id="edit_department" class="form-control-v2 shadow-none">
+                               <option value="">Unassigned</option>
+                               {% for d in depts %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+                           </select>
+                       </div>
+                        <div class="col-12"><label class="form-label-v2">Change Password (Optional)</label><input type="password" name="password" class="form-control-v2 shadow-none" placeholder="Leave blank to keep current"></div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pb-4 px-4">
+                    <button type="submit" class="btn btn-create-v2 py-2" style="background: var(--primary, #3b82f6); border: none;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // 1. Teleport Modal
+    const modalEl = document.getElementById('editUserModal');
+    if (modalEl && modalEl.parentElement !== document.body) {
+        document.body.appendChild(modalEl);
+    }
+
+    window.openEditModal = function(btn) {
+        document.getElementById('edit_user_id').value = btn.dataset.id;
+        document.getElementById('edit_username').value = btn.dataset.username;
+        document.getElementById('edit_full_name').value = btn.dataset.fullname;
+        document.getElementById('edit_email').value = btn.dataset.email;
+        document.getElementById('edit_role').value = btn.dataset.role;
+        document.getElementById('edit_department').value = btn.dataset.department;
+        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    };
+
+    // 2. AJAX Search Interceptor
+    const searchForm = document.getElementById('userSearchForm');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const searchVal = this.querySelector('input[name="search"]').value;
+            const url = `{{ url_for('users') }}?search=${encodeURIComponent(searchVal)}`;
+            if (typeof fetchAndRender === 'function') {
+                window.history.pushState({}, '', url);
+                fetchAndRender(url);
+            } else {
+                window.location.href = url;
+            }
+        });
+    }
+
+    // 3. Bulk & Select All Logic
+    const selectAll = document.getElementById('selectAllCheckbox');
+    const checkboxes = document.querySelectorAll('.user-checkbox');
+    const bulkForm = document.getElementById('bulkAssignForm');
+
+    if (selectAll) {
+        selectAll.onclick = function() {
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        };
+    }
+
+    if (bulkForm) {
+        bulkForm.onsubmit = function(e) {
+            const selected = document.querySelectorAll('.user-checkbox:checked');
+            if (selected.length === 0) {
+                alert('Please select users from the table first.');
+                e.preventDefault();
+                return;
+            }
+            selected.forEach(cb => {
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden'; hidden.name = 'user_ids'; hidden.value = cb.value;
+                bulkForm.appendChild(hidden);
+            });
+        };
+    }
+
+    // Dark Mode check for Close Button filter variables
+    const bodyEl = document.body;
+    const setCloseBtnFilter = () => {
+        if (bodyEl.classList.contains('dark-mode')) {
+            document.documentElement.style.setProperty('--close-btn-filter', 'invert(1) grayscale(100%) brightness(200%)');
+        } else {
+            document.documentElement.style.setProperty('--close-btn-filter', 'none');
+        }
+    };
+    setCloseBtnFilter();
+    const observer = new MutationObserver(setCloseBtnFilter);
+    observer.observe(bodyEl, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
+{% endblock %}

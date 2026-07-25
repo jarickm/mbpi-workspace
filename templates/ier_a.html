@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Segmented Control --- */
+    .segmented-control {
+        display: inline-flex; background: var(--surface-bento); padding: 5px;
+        border-radius: 20px; border: 1px solid var(--border-bento);
+        height: 48px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .seg-tab {
+        padding: 6px 25px; border-radius: 14px; font-weight: 700; font-size: 0.85rem;
+        text-decoration: none; color: var(--text-tertiary); transition: all 0.2s ease;
+        display: flex; align-items: center; gap: 8px; border: none; background: transparent;
+    }
+    .seg-tab.active { background: var(--bg-main); color: var(--text-primary); border: 1px solid var(--border-bento); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .seg-tab:not(.active):hover { color: var(--text-primary); }
+
+    /* --- Bento Stepper Cards --- */
+    .step-card {
+        background: var(--surface-bento); border: 1px solid var(--border-bento);
+        padding: 24px; border-radius: 24px; position: relative; overflow: hidden;
+        transition: transform 0.3s ease, background-color 0.3s ease; height: 100%;
+        box-shadow: var(--card-shadow);
+    }
+    .step-card:hover { transform: translateY(-3px); box-shadow: var(--card-shadow-hover); }
+
+    .step-badge {
+        width: 36px; height: 36px; border-radius: 12px; display: flex; align-items: center;
+        justify-content: center; font-weight: 800; font-size: 0.9rem; margin-bottom: 15px;
+    }
+    .step-badge.c-blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .step-badge.c-orange { background: rgba(249, 115, 22, 0.15); color: #ea580c; }
+    .step-badge.c-green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+    /* --- Form Styles --- */
+    .form-container-bento {
+        background: var(--surface-bento) !important;
+        border: 1px solid var(--border-bento) !important;
+        border-radius: 28px !important;
+        box-shadow: var(--card-shadow);
+    }
+    .form-label-v2 { font-size: 0.72rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; display: block; }
+
+    .form-control-v2 {
+        background: var(--input-bg); border: 1px solid var(--input-border);
+        border-radius: 14px; padding: 12px 18px; color: var(--text-primary);
+        font-weight: 600; width: 100%; transition: all 0.2s;
+    }
+    .form-control-v2:focus { border-color: var(--primary, #3b82f6); outline: none; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+    .form-control-v2::placeholder { color: var(--text-tertiary); }
+    .form-control-v2:disabled, .form-control-v2[readonly] { opacity: 0.6; cursor: not-allowed; }
+
+    /* --- Unified Data Table --- */
+    .data-table-bento {
+        background: var(--surface-bento); border-radius: 28px; border: 1px solid var(--border-bento);
+        box-shadow: var(--card-shadow); overflow: hidden;
+    }
+
+    /* ========================================= */
+    /* --- BOOTSTRAP TABLE BACKGROUND FIX --- */
+    /* ========================================= */
+    .table,
+    .table > tbody,
+    .table > tbody > tr,
+    .table > tbody > tr > td,
+    .table > thead > tr > th {
+        background-color: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-striped-bg: transparent !important;
+    }
+
+    .table thead th {
+        color: var(--text-tertiary); font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 1px; padding: 18px 25px; border-bottom: 1px solid var(--border-bento); font-weight: 800;
+        background: rgba(0,0,0,0.02) !important;
+    }
+    .table tbody td { padding: 18px 25px; vertical-align: middle; border-bottom: 1px solid var(--border-bento); color: var(--text-primary); font-size: 0.9rem; }
+    .table tbody tr:hover { background-color: var(--row-hover-bg) !important; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* Soft UI Pills */
+    .status-pill-v2 {
+        padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 800;
+        text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+    }
+    .status-pill-v2.signed { background: rgba(16, 185, 129, 0.15); color: #059669; }
+    .status-pill-v2.pending { background: rgba(249, 115, 22, 0.15); color: #ea580c; }
+    .status-pill-v2.waiting { background: var(--input-bg); color: var(--text-secondary); border: 1px solid var(--border-bento); }
+
+    body.dark-mode .status-pill-v2.signed { color: #34d399; }
+    body.dark-mode .status-pill-v2.pending { color: #fb923c; }
+
+    .ier-ref {
+        font-family: 'JetBrains Mono', monospace; font-weight: 800; background: var(--input-bg);
+        padding: 5px 12px; border-radius: 8px; color: var(--text-primary); border: 1px solid var(--border-bento);
+        font-size: 0.85rem;
+    }
+
+    /* Action Links styled as Soft Buttons */
+    .btn-approve-inline {
+        background: #10b981; color: white !important; font-size: 0.7rem; font-weight: 800;
+        padding: 4px 10px; border-radius: 6px; text-decoration: none; display: inline-block;
+        transition: transform 0.1s, background-color 0.2s; border: none; box-shadow: 0 2px 5px rgba(16, 185, 129, 0.2);
+    }
+    .btn-approve-inline:hover { transform: translateY(-1px); background: #059669; }
+
+    /* Custom Icon action Boxes */
+    .icon-box {
+        display: flex; align-items: center; justify-content: center; text-decoration: none;
+        transition: transform 0.2s, background-color 0.2s;
+    }
+    .icon-box:hover { transform: scale(1.05); }
+    .icon-box.c-blue { background: rgba(59, 130, 246, 0.15) !important; color: #3b82f6; }
+    .icon-box.c-orange { background: rgba(249, 115, 22, 0.15) !important; color: #ea580c; }
+
+    /* Status Badges */
+    .badge-capsule {
+        font-size: 0.65rem; font-weight: 800; border-radius: 100px; padding: 6px 14px; display: inline-block;
+    }
+</style>
+
+<div class="mb-4 mt-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">Workspace</li>
+            <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">IER Form A</li>
+        </ol>
+    </nav>
+    <h2 class="page-title m-0">Incident Equipment Report</h2>
+</div>
+
+{% if edit_data %}
+    <div class="fade-in">
+        <!-- Edit Warning Banner -->
+        <div class="alert p-4 mb-4 rounded-4 d-flex justify-content-between align-items-center flex-wrap gap-3" style="background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249, 115, 22, 0.3);">
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box c-orange d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; border-radius: 12px;"><i class="fa-solid fa-pen-to-square fs-5"></i></div>
+                <div>
+                    <h6 class="m-0 fw-800" style="color: #ea580c;">Editing Record: {{ edit_data.ier_no }}</h6>
+                    <p class="m-0 small" style="color: var(--text-secondary); margin-top: 2px;">Signature assets are preserved unless personnel roles are reassigned.</p>
+                </div>
+            </div>
+            <a href="{{ url_for('ier_a') }}" class="btn btn-sm fw-bold px-4 rounded-pill ajax-link text-white" style="background: #ea580c; border: none;">Discard Changes</a>
+        </div>
+
+        <!-- Edit Form -->
+        <div class="form-container-bento p-4 p-md-5">
+            <form action="{{ url_for('edit_ier_a', id=edit_data.id) }}" method="POST">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label-v2">IER Tracking Number</label>
+                        <input type="text" name="ier_no" class="form-control-v2 shadow-none" value="{{ edit_data.ier_no }}" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-v2">Dept. Head / Manager</label>
+                        <select name="dept_head_id" class="form-control-v2 shadow-none">
+                            <option value="">-- Select Manager --</option>
+                            {% for u in all_users %}
+                            <option value="{{ u.user_id }}" {% if u.user_id == edit_data.dept_head_id %}selected{% endif %}>{{ u.username }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label-v2">Assigned IT Specialist</label>
+                        <select name="it_personnel_id" class="form-control-v2 shadow-none">
+                            <option value="">-- Select IT --</option>
+                            {% for tech in it_staff %}
+                            <option value="{{ tech.user_id }}" {% if tech.user_id == edit_data.it_personnel_id %}selected{% endif %}>{{ tech.full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4"><label class="form-label-v2">Asset Property Code</label><input type="text" name="asset_code" class="form-control-v2 shadow-none" value="{{ edit_data.asset_code }}"></div>
+                    <div class="col-md-4"><label class="form-label-v2">Position / Title</label><input type="text" name="position_title" class="form-control-v2 shadow-none" value="{{ edit_data.position_title }}"></div>
+                    <div class="col-md-4"><label class="form-label-v2">Department</label><input type="text" name="department" class="form-control-v2 shadow-none" value="{{ edit_data.department }}"></div>
+                    <div class="col-12"><label class="form-label-v2">Hardware / System Description</label><input type="text" name="item_description" class="form-control-v2 shadow-none" value="{{ edit_data.item_description }}"></div>
+                    <div class="col-12"><label class="form-label-v2">Detailed Incident Analysis</label><textarea name="issue_details" class="form-control-v2 shadow-none" rows="6">{{ edit_data.issue_details }}</textarea></div>
+                    <div class="col-12 pt-3">
+                        <button type="submit" class="btn btn-primary fw-bold w-100 py-3 rounded-4 shadow-sm" style="background: var(--primary, #3b82f6); border: none;">Save Updated Record</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% else %}
+    <!-- V2 WORKFLOW STEPPER -->
+    <div class="row g-3 mb-4 fade-in">
+        <div class="col-md-4">
+            <div class="step-card">
+                <div class="step-badge c-blue">1</div>
+                <h6 class="fw-800 small mb-1" style="color: var(--text-primary);">DATA ENTRY</h6>
+                <p class="small mb-0 fw-600" style="color: var(--text-secondary);">Requester provides incident and equipment details.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="step-card">
+                <div class="step-badge c-orange">2</div>
+                <h6 class="fw-800 small mb-1" style="color: var(--text-primary);">MANAGER SIGN-OFF</h6>
+                <p class="small mb-0 fw-600" style="color: var(--text-secondary);">Assigned Department Head verifies the claim.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="step-card">
+                <div class="step-badge c-green">3</div>
+                <h6 class="fw-800 small mb-1" style="color: var(--text-primary);">IT VERIFICATION</h6>
+                <p class="small mb-0 fw-600" style="color: var(--text-secondary);">IT confirms technical details and closes record.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- V2 SEGMENTED TABS -->
+    <div class="segmented-control" id="ierTabs" role="tablist">
+        <button class="seg-tab active" data-bs-toggle="tab" data-bs-target="#create-tab">
+            <i class="fa-solid fa-plus-circle"></i> Create New Form
+        </button>
+        <button class="seg-tab" data-bs-toggle="tab" data-bs-target="#archive-tab">
+            <i class="fa-solid fa-box-archive"></i> Archive & Approvals
+        </button>
+    </div>
+
+    <div class="tab-content fade-in">
+        <!-- TAB: CREATE -->
+        <div class="tab-pane fade show active" id="create-tab">
+            <div class="form-container-bento p-4 p-md-5">
+                <form method="POST">
+                    <div class="row g-4">
+                        <div class="col-md-6"><label class="form-label-v2">IER Tracking Number *</label><input type="text" name="ier_no" class="form-control-v2 shadow-none" placeholder="SMP26-01-001" required></div>
+                        <div class="col-md-6"><label class="form-label-v2">Requester Name</label><input type="text" class="form-control-v2 shadow-none opacity-50" value="{{ session.get('full_name') }}" readonly></div>
+
+                        <div class="col-md-6">
+                            <label class="form-label-v2">Dept. Head Approval *</label>
+                            <select name="dept_head_id" class="form-control-v2 shadow-none" required>
+                                <option value="" selected disabled>Select Manager...</option>
+                                {% for u in all_users %}<option value="{{ u.user_id }}">{{ u.username }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label-v2">IT Personnel Verification *</label>
+                            <select name="it_personnel_id" class="form-control-v2 shadow-none" required>
+                                <option value="" selected disabled>Select Technician...</option>
+                                {% for tech in it_staff %}<option value="{{ tech.user_id }}">{{ tech.full_name }}</option>{% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-4"><label class="form-label-v2">Asset Code</label><input type="text" name="asset_code" class="form-control-v2 shadow-none" placeholder="CCI-000"></div>
+                        <div class="col-md-8"><label class="form-label-v2">Equipment Description</label><input type="text" name="item_description" class="form-control-v2 shadow-none" placeholder="e.g. Dell Latitude Laptop Core i5"></div>
+                        <div class="col-12"><label class="form-label-v2">Incident Details</label><textarea name="issue_details" class="form-control-v2 shadow-none" rows="3" placeholder="Provide description of how the incident happened..."></textarea></div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary fw-800 px-5 py-3 rounded-4 shadow-sm" style="background: var(--primary, #3b82f6); border: none;">
+                                Initialize Workflow <i class="fa-solid fa-paper-plane ms-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB: ARCHIVE -->
+        <div class="tab-pane fade" id="archive-tab">
+            <div class="data-table-bento">
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th style="padding-left: 25px;">IER Reference</th>
+                                <th>Dept. Head Signature</th>
+                                <th>IT Verification</th>
+                                <th>Final Status</th>
+                                <th class="text-end" style="padding-right: 25px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in forms %}
+                            <tr>
+                                <td class="py-4 px-4" style="padding-left: 25px !important;">
+                                    <span class="ier-ref">{{ f.ier_no }}</span>
+                                    <div class="small mt-2 fw-bold" style="color: var(--text-secondary);">{{ f.employee_name }}</div>
+                                </td>
+
+                                <!-- MANAGER APPROVAL -->
+                                <td>
+                                    {% if f.dept_head_status == 'Approved' %}
+                                        <span class="status-pill-v2 signed"><i class="fa-solid fa-check-double"></i> Signed</span>
+                                        <div class="small fw-800 mt-1" style="color: var(--text-primary);">{{ f.dept_head_name }}</div>
+                                    {% else %}
+                                        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                            <span class="status-pill-v2 pending">Pending</span>
+                                            {% if session['user_id'] == f.dept_head_id %}
+                                            <a href="{{ url_for('approve_ier', id=f.id, role='manager') }}" class="btn-approve-inline ajax-link">SIGN</a>
+                                            {% endif %}
+                                        </div>
+                                        <div class="small fw-bold" style="color: var(--text-tertiary);">Awaiting: {{ f.dept_head_name }}</div>
+                                    {% endif %}
+                                </td>
+
+                                <!-- IT VERIFICATION -->
+                                <td>
+                                    {% if f.it_status == 'Approved' %}
+                                        <span class="status-pill-v2 signed"><i class="fa-solid fa-circle-check"></i> Verified</span>
+                                        <div class="small fw-800 mt-1" style="color: var(--text-primary);">{{ f.it_staff_name }}</div>
+                                    {% else %}
+                                        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                            <span class="status-pill-v2 waiting">Awaiting</span>
+                                            {% if session['user_id'] == f.it_personnel_id and f.dept_head_status == 'Approved' %}
+                                            <a href="{{ url_for('approve_ier', id=f.id, role='it') }}" class="btn-approve-inline ajax-link" style="background: #3b82f6; box-shadow: 0 2px 5px rgba(59,130,246,0.2);">VERIFY</a>
+                                            {% endif %}
+                                        </div>
+                                        <div class="small fw-bold" style="color: var(--text-tertiary);">Assignee: {{ f.it_staff_name }}</div>
+                                    {% endif %}
+                                </td>
+
+                                <!-- FINAL STATUS -->
+                                <td>
+                                    {% if f.workflow_status == 'Completed' %}
+                                        <span class="badge-capsule bg-success bg-opacity-10 text-success border border-success border-opacity-20">DOC READY</span>
+                                    {% else %}
+                                        <span class="badge-capsule border" style="background: var(--input-bg); color: var(--text-secondary); border-color: var(--border-bento) !important;">PROCESSING</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- ACTIONS -->
+                                <td class="text-end px-4" style="padding-right: 25px !important;">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="{{ url_for('print_ier_a', id=f.id) }}" target="_blank" class="icon-box c-blue" style="width: 38px; height: 38px; border-radius: 10px;" title="Print Document">
+                                            <i class="fa-solid fa-print"></i>
+                                        </a>
+                                        {% if session.get('user_role', '').lower() == 'super admin' %}
+                                        <a href="{{ url_for('ier_a', edit_id=f.id) }}" class="icon-box c-orange ajax-link" style="width: 38px; height: 38px; border-radius: 10px;" title="Edit Analysis">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="5" class="text-center py-5 fw-bold" style="color: var(--text-tertiary);">No IER Form A records detected.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<script>
+    (function() {
+        // Any V2 tab transition logic or modal fixes can go here
+    })();
+</script>
+{% endblock %}

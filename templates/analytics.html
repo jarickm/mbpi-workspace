@@ -1,0 +1,397 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* Department Switcher Pill */
+    .dept-switcher {
+        background: var(--surface-bento);
+        border: 1px solid var(--border-bento);
+        border-radius: 100px;
+        padding: 5px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* ========================================= */
+    /* --- BROWSER DROPDOWN VISIBILITY FIX --- */
+    /* ========================================= */
+    select option {
+        background-color: var(--surface-bento) !important;
+        color: var(--text-primary) !important;
+    }
+
+    /* Metric Cards V2 (Glow Style) */
+    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
+
+    .stat-card-v2 {
+        background: var(--surface-bento);
+        border: 1px solid var(--border-bento);
+        padding: 28px;
+        border-radius: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        box-shadow: var(--card-shadow);
+    }
+
+    .stat-card-v2::before {
+        content: ''; position: absolute; top: -30px; right: -30px; width: 140px; height: 140px;
+        border-radius: 50%; filter: blur(40px); opacity: 0.12; z-index: 0; transition: 0.4s ease;
+    }
+    body.dark-mode .stat-card-v2::before { opacity: 0.22; }
+
+    .stat-card-v2:hover { transform: translateY(-5px); box-shadow: var(--card-shadow-hover); }
+    .stat-card-v2:hover::before { opacity: 0.35; transform: scale(1.2); }
+
+    .stat-card-v2 .metric-label { font-size: 0.8rem; font-weight: 800; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 1px; z-index: 1; }
+    .stat-card-v2 .metric-value { font-size: 3rem; font-weight: 800; color: var(--text-primary); line-height: 1; z-index: 1; letter-spacing: -1.5px; }
+    .stat-card-v2 i { position: absolute; bottom: 20px; right: 25px; font-size: 1.5rem; opacity: 0.2; z-index: 1; }
+
+    /* Theme-specific glows */
+    .glow-indigo::before { background: #4f46e5; } .glow-indigo i { color: #818cf8; opacity: 0.5; }
+    .glow-orange::before { background: #f97316; } .glow-orange i { color: #fb923c; opacity: 0.5; }
+    .glow-green::before { background: #10b981; } .glow-green i { color: #34d399; opacity: 0.5; }
+    .glow-red::before { background: #ef4444; } .glow-red i { color: #f87171; opacity: 0.5; }
+
+    /* Chart Bento Boxes */
+    .chart-bento {
+        background: var(--surface-bento);
+        border-radius: 32px;
+        border: 1px solid var(--border-bento);
+        padding: 30px;
+        height: 100%;
+        box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* Modal Table Styling */
+    .modal-content { border-radius: 32px; border: 1px solid var(--border-bento); background: var(--surface-bento); color: var(--text-primary); }
+    .v2-modal-header { border-bottom: 1px solid var(--border-bento); padding: 1.5rem 2rem; }
+
+    .id-tag {
+        font-family: 'JetBrains Mono', monospace; font-weight: 800; background: var(--input-bg);
+        padding: 5px 12px; border-radius: 8px; color: var(--text-primary); border: 1px solid var(--border-bento);
+        font-size: 0.85rem;
+    }
+
+    /* ========================================= */
+    /* --- BOOTSTRAP TABLE BACKGROUND FIX --- */
+    /* ========================================= */
+    .table,
+    .table > tbody,
+    .table > tbody > tr,
+    .table > tbody > tr > td,
+    .table > thead > tr > th {
+        background-color: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-striped-bg: transparent !important;
+    }
+
+    /* Table Styling inside Modal */
+    .table thead th {
+        color: var(--text-tertiary); font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 1px; padding: 18px 25px; border-bottom: 1px solid var(--border-bento); font-weight: 800;
+        background: rgba(0,0,0,0.02) !important;
+    }
+    .table tbody td { padding: 18px 25px; vertical-align: middle; border-bottom: 1px solid var(--border-bento); color: var(--text-primary); font-size: 0.9rem; }
+    .table tbody tr:hover { background-color: var(--row-hover-bg) !important; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* Custom Close Button Check */
+    .modal-backdrop.show { opacity: 0.4; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); background-color: #0f172a; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3 mt-2">
+    <div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">Workspace</li>
+                <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">Intelligence</li>
+            </ol>
+        </nav>
+        <h2 class="page-title m-0">Performance Insights</h2>
+    </div>
+
+    {% if current_user_role in ['super admin', 'admin', 'management'] %}
+    <div class="dept-switcher">
+        <i class="fa-solid fa-filter small" style="color: var(--primary, #3b82f6);"></i>
+        <form method="GET" action="{{ url_for('analytics') }}" class="d-flex align-items-center">
+            <select name="dept" class="form-select form-select-sm border-0 fw-800 bg-transparent shadow-none" onchange="this.form.submit()" style="cursor: pointer; font-size: 0.85rem; color: var(--text-primary);">
+                <option value="All" {% if selected_dept == 'All' %}selected{% endif %}>Global Overview</option>
+                {% for d in depts_list %}<option value="{{ d }}" {% if selected_dept == d %}selected{% endif %}>{{ d }}</option>{% endfor %}
+            </select>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<!-- V2 GLOW METRIC GRID -->
+<div class="metric-grid mb-5">
+    <div class="stat-card-v2 glow-indigo" onclick="loadDetails('total', 'Total Volume: {{ selected_dept }}')">
+        <span class="metric-label">Total Volume</span>
+        <div class="metric-value">{{ total_tickets|default(0) }}</div>
+        <i class="fa-solid fa-layer-group"></i>
+    </div>
+    <div class="stat-card-v2 glow-orange" onclick="loadDetails('open', 'Active Workload: {{ selected_dept }}')">
+        <span class="metric-label">Active Workload</span>
+        <div class="metric-value">{{ open_tickets|default(0) }}</div>
+        <i class="fa-solid fa-spinner"></i>
+    </div>
+    <div class="stat-card-v2 glow-green" onclick="loadDetails('resolved', 'Closed Tickets: {{ selected_dept }}')">
+        <span class="metric-label">Resolved</span>
+        <div class="metric-value">{{ resolved_tickets|default(0) }}</div>
+        <i class="fa-solid fa-circle-check"></i>
+    </div>
+    <div class="stat-card-v2 glow-red" onclick="loadDetails('breached', 'SLA Breaches: {{ selected_dept }}')">
+        <span class="metric-label">SLA Breaches</span>
+        <div class="metric-value">{{ sla_breaches|default(0) }}</div>
+        <i class="fa-solid fa-fire-flame-curved"></i>
+    </div>
+</div>
+
+<!-- CHARTS SECTION -->
+<div class="row g-4 mb-5">
+    <div class="col-lg-8">
+        <div class="chart-bento">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h6 class="fw-800 m-0" style="color: var(--text-primary);">Volume Trend Line</h6>
+                <div class="small fw-bold" style="color: var(--text-secondary);">Past 30 Days</div>
+            </div>
+            <div style="height: 320px;"><canvas id="trendChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="chart-bento">
+            <h6 class="fw-800 mb-4" style="color: var(--text-primary);">Status Distribution</h6>
+            <div style="height: 320px;"><canvas id="statusChart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<!-- DRILL-DOWN MODAL -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="v2-modal-header d-flex justify-content-between align-items-center">
+                <h5 class="fw-800 mb-0" id="modalTitle" style="color: var(--text-primary);">Data Analysis</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" style="filter: var(--close-btn-filter);"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4">Reference</th>
+                                <th>Subject</th>
+                                <th>Requester</th>
+                                <th>Status</th>
+                                <th>Timestamp</th>
+                                <th class="pe-4 text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalBodyContent" style="border-top: 1px solid var(--border-bento);">
+                            <!-- Dynamic Content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    let modalInstance = null;
+    const modalEl = document.getElementById('detailsModal');
+
+    // Teleport modal for SPA compatibility
+    if (modalEl && modalEl.parentElement !== document.body) {
+        document.body.appendChild(modalEl);
+    }
+
+    // Load Data Function
+    window.loadDetails = function(filter, title) {
+        if (!modalInstance) {
+            modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+        }
+
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalBodyContent').innerHTML = `
+            <tr><td colspan="6" class="text-center py-5">
+                <div class="spinner-border text-primary mb-3"></div>
+                <p class="fw-800 small" style="color: var(--text-secondary);">FETCHING ANALYTICAL DATA...</p>
+            </td></tr>`;
+
+        modalInstance.show();
+
+        const selectedDept = encodeURIComponent("{{ selected_dept }}");
+        fetch(`/api/analytics/details/${filter}?dept=${selectedDept}`)
+            .then(res => res.json())
+            .then(data => {
+                let html = '';
+                if (!data || data.length === 0) {
+                    html = '<tr><td colspan="6" class="text-center py-5 fw-bold" style="color: var(--text-tertiary);">No records matched the filter criteria.</td></tr>';
+                } else {
+                    data.forEach(t => {
+                        html += `
+                            <tr>
+                                <td class="ps-4"><span class="id-tag">#${t.id}</span></td>
+                                <td class="fw-800" style="color: var(--text-primary);">${t.subject}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-sm" style="width:26px; height:26px; font-size:0.7rem; background: var(--avatar-bg); color: var(--avatar-text); display:flex; align-items:center; justify-content:center; border-radius:8px; font-weight:800;">${t.name[0]}</div>
+                                        <span class="small fw-700" style="color: var(--text-secondary);">${t.name}</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge" style="background: var(--input-bg); color: var(--text-secondary); border: 1px solid var(--border-bento); font-size:0.65rem; font-weight: 800; border-radius: 100px; padding: 6px 14px;">${t.status.toUpperCase()}</span></td>
+                                <td class="small fw-bold" style="color: var(--text-secondary);">${t.date}</td>
+                                <td class="pe-4 text-end">
+                                    <a href="/ticket/${t.id}" class="btn btn-sm fw-800 px-3 rounded-3" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6; font-size:0.75rem;" target="_blank">Review</a>
+                                </td>
+                            </tr>`;
+                    });
+                }
+                document.getElementById('modalBodyContent').innerHTML = html;
+            });
+    };
+
+    // Nuclear Modal Cleanup
+    modalEl.addEventListener('hidden.bs.modal', () => {
+        document.querySelectorAll('.modal-backdrop').forEach(b => b.remove());
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        if (modalInstance) { modalInstance.dispose(); modalInstance = null; }
+    });
+
+    // Charting Logic
+    const drawCharts = () => {
+        const trendCtx = document.getElementById('trendChart');
+        if (trendCtx) {
+            new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ trend_labels|tojson }},
+                    datasets: [{
+                        label: 'Tickets',
+                        data: {{ trend_data|tojson }},
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { display: false }, ticks: { font: { weight: 'bold' } } },
+                        x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } }
+                    }
+                }
+            });
+        }
+
+        const statusCtx = document.getElementById('statusChart');
+        if (statusCtx) {
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Resolved', 'Active', 'Pending', 'Overdue'],
+                    datasets: [{
+                        data: {{ status_data|tojson }},
+                        backgroundColor: ['#10b981', '#6366f1', '#f59e0b', '#ef4444'],
+                        borderWidth: 0,
+                        hoverOffset: 15
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '78%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { weight: 'bold' } } }
+                    }
+                }
+            });
+        }
+    };
+
+    setTimeout(drawCharts, 150);
+
+    // Dark Mode check for Close Button filter variables
+    const bodyEl = document.body;
+    const setCloseBtnFilter = () => {
+        if (bodyEl.classList.contains('dark-mode')) {
+            document.documentElement.style.setProperty('--close-btn-filter', 'invert(1) grayscale(100%) brightness(200%)');
+        } else {
+            document.documentElement.style.setProperty('--close-btn-filter', 'none');
+        }
+    };
+    setCloseBtnFilter();
+    const observer = new MutationObserver(setCloseBtnFilter);
+    observer.observe(bodyEl, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
+{% endblock %}

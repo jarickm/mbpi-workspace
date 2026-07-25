@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBPI HelpDesk | Workspace</title>
+
+    <!-- SEO and Accessibility Meta Tags -->
+    <meta name="description" content="The official helpdesk and IT support workspace for MBPI employees.">
+    <meta name="author" content="MBPI IT Department">
+    <meta name="theme-color" content="#002e5d">
+
+    <!-- Favicon Links -->
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #002e5d;
+            --accent: #d71921;
+            --body-bg: #f4f7f9;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --bento-bg: #ffffff;
+            --bento-border: rgba(0, 46, 93, 0.05);
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --transition: all 0.2s ease-in-out;
+
+            /* Icon Base Colors */
+            --c-blue: #0ea5e9;    --bg-blue: #e0f2fe;
+            --c-purple: #a855f7;  --bg-purple: #f3e8ff;
+            --c-green: #22c55e;   --bg-green: #dcfce7;
+            --c-orange: #f97316;  --bg-orange: #ffedd5;
+            --c-pink: #ec4899;    --bg-pink: #fce7f3;
+            --c-teal: #14b8a6;    --bg-teal: #ccfbf1;
+            --c-red: #ef4444;     --bg-red: #fee2e2;
+            --c-yellow: #eab308;  --bg-yellow: #fef9c3;
+            --c-indigo: #6366f1;  --bg-indigo: #e0e7ff;
+        }
+
+        /* Dark Mode Theme Variables */
+        body.dark-mode {
+            --primary: #4e8eff;
+            --accent: #ff4d55;
+            --body-bg: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.45);
+            --glass-border: rgba(51, 65, 85, 0.6);
+            --bento-bg: #1e293b;
+            --bento-border: rgba(255, 255, 255, 0.05);
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+
+            /* Dark Mode Icon Backgrounds */
+            --bg-blue: rgba(14, 165, 233, 0.15);
+            --bg-purple: rgba(168, 85, 247, 0.15);
+            --bg-green: rgba(34, 197, 94, 0.15);
+            --bg-orange: rgba(249, 115, 22, 0.15);
+            --bg-pink: rgba(236, 72, 153, 0.15);
+            --bg-teal: rgba(20, 184, 166, 0.15);
+            --bg-red: rgba(239, 68, 68, 0.15);
+            --bg-yellow: rgba(234, 179, 8, 0.15);
+            --bg-indigo: rgba(99, 102, 241, 0.15);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- SIDEBAR BASE --- */
+        #sidebar {
+            width: 290px;
+            background: transparent;
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 1000;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-inner {
+            background: var(--bento-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+        }
+
+        .sidebar-scroll-area {
+            flex: 1; overflow-y: auto; padding-right: 5px;
+        }
+        .sidebar-scroll-area::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll-area::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+        .brand-area {
+            font-size: 1.4rem; font-weight: 800; color: var(--text-color); display: flex; align-items: center; gap: 10px; padding-bottom: 20px; padding-left: 5px;
+        }
+        .brand-area span { color: var(--accent); }
+
+        .sidebar-user-card {
+            background: var(--bento-bg); border-radius: 16px; padding: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--bento-border); box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .mini-avatar {
+            width: 40px; height: 40px; background: var(--primary); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; flex-shrink: 0;
+        }
+
+        .section-header {
+            font-size: 0.65rem; text-transform: uppercase; font-weight: 800; color: var(--text-muted); letter-spacing: 1.2px; padding-left: 10px; margin-top: 20px; margin-bottom: 8px;
+        }
+
+        /* --- STABLE LIST MODE --- */
+        .sidebar-nav-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(0, 46, 93, 0.04);
+            color: var(--primary);
+        }
+        body.dark-mode .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .nav-item.active {
+            background-color: var(--bg-indigo);
+            color: var(--c-indigo);
+        }
+        body.dark-mode .nav-item.active {
+            background-color: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+        }
+
+        .icon-box {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .c-blue { color: var(--c-blue); background: var(--bg-blue); }
+        .c-purple { color: var(--c-purple); background: var(--bg-purple); }
+        .c-green { color: var(--c-green); background: var(--bg-green); }
+        .c-orange { color: var(--c-orange); background: var(--bg-orange); }
+        .c-pink { color: var(--c-pink); background: var(--bg-pink); }
+        .c-teal { color: var(--c-teal); background: var(--bg-teal); }
+        .c-red { color: var(--c-red); background: var(--bg-red); }
+        .c-yellow { color: var(--c-yellow); background: var(--bg-yellow); }
+        .c-indigo { color: var(--c-indigo); background: var(--bg-indigo); }
+
+        #content-wrapper { margin-left: 290px; width: calc(100% - 290px); min-height: 100vh; padding: 20px 30px 30px 10px; }
+
+        #topnav {
+            background: var(--bento-bg);
+            height: 70px; border-radius: 20px;
+            display: flex; align-items: center; padding: 0 25px;
+            justify-content: space-between; margin-bottom: 25px;
+            border: 1px solid var(--bento-border);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.02);
+        }
+
+        .search-bento {
+            background: var(--body-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+        }
+        .search-bento input {
+            background: transparent; border: none; box-shadow: none !important; color: var(--text-color);
+        }
+
+        .btn-bento {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: var(--body-bg);
+            color: var(--text-color);
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid transparent; transition: background-color 0.2s;
+        }
+        .btn-bento:hover { background: var(--glass-border); }
+
+        .btn-logout { background: var(--bg-red); color: var(--c-red); border-radius: 10px; padding: 8px 16px; font-weight: 700; border: none; font-size: 0.9rem; transition: background-color 0.2s; }
+        .btn-logout:hover { background: var(--c-red); color: white; }
+
+        #dynamic-content { transition: opacity 0.2s ease; }
+        .is-loading { opacity: 0.5; pointer-events: none; }
+
+        @media (max-width: 992px) {
+            #sidebar { transform: translateX(-100%); width: 290px; padding: 10px; transition: transform 0.3s ease; }
+            #content-wrapper { margin-left: 0; width: 100%; padding: 15px; }
+            #topnav { border-radius: 16px; padding: 0 15px; }
+        }
+
+        .modal { z-index: 2050 !important; }
+        .modal-backdrop { z-index: 2040 !important; background-color: rgba(0, 0, 0, 0.5) !important; backdrop-filter: blur(4px); }
+        body.modal-open { overflow: hidden !important; padding-right: 0 !important; }
+    </style>
+</head>
+<body>
+
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div id="sidebar" role="navigation" aria-label="Main Navigation">
+            <div class="sidebar-inner">
+                <div class="brand-area">
+                    <i class="fa-solid fa-layer-group c-blue" style="background: var(--bg-blue); padding: 8px; border-radius: 10px; font-size: 1.1rem;"></i>
+                    <div>MBPI<span>.</span> <div style="font-size: 0.4em; opacity: 0.5; letter-spacing: 2px; margin-top: -5px;">WORKSPACE</div></div>
+                </div>
+
+                <div class="sidebar-user-card">
+                    <div class="mini-avatar">
+                        {{ session.get('username', 'G')[0] | upper }}
+                    </div>
+                    <div class="overflow-hidden">
+                        <div class="fw-800 text-truncate" style="font-size: 0.9rem;">{{ session.get('username', 'Guest') }}</div>
+                        <div class="text-success fw-bold d-flex align-items-center gap-2" style="font-size: 0.65rem;">
+                            <div style="width: 6px; height: 6px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 4px #22c55e;"></div> ONLINE
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-scroll-area">
+    <div class="sidebar-nav-list">
+
+        {% set current_user_role = session.get('user_role', '').lower() %}
+
+        <!-- Core Section -->
+        <div class="section-header">Core Apps</div>
+
+        <a href="{{ url_for('dashboard') }}" class="nav-item ajax-link">
+            <div class="icon-box c-blue"><i class="fa-solid fa-house"></i></div>
+            <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('profile') }}" class="nav-item ajax-link">
+            <div class="icon-box c-purple"><i class="fa-solid fa-id-card"></i></div>
+            <span>My Profile</span>
+        </a>
+        <a href="{{ url_for('knowledge_base') }}" class="nav-item ajax-link">
+            <div class="icon-box c-green"><i class="fa-solid fa-book-open"></i></div>
+            <span>Knowledge Base</span>
+        </a>
+
+        {% if can_see_directory %}
+        <a href="{{ url_for('directory') }}" class="nav-item ajax-link">
+            <div class="icon-box c-orange"><i class="fa-solid fa-address-book"></i></div>
+            <span>Directory</span>
+        </a>
+        {% endif %}
+
+        <!-- Admin Tools -->
+        {% if can_see_admin_tools %}
+        <div class="section-header">Admin Tools</div>
+
+        <a href="{{ url_for('manage_ticket_types') }}" class="nav-item ajax-link">
+            <div class="icon-box c-orange"><i class="fa-solid fa-tags"></i></div>
+            <span>Ticket Categories</span>
+        </a>
+
+        <a href="{{ url_for('analytics') }}" class="nav-item ajax-link">
+            <div class="icon-box c-pink"><i class="fa-solid fa-chart-pie"></i></div>
+            <span>Analytics</span>
+        </a>
+        <a href="{{ url_for('sla_analytics') }}" class="nav-item ajax-link">
+            <div class="icon-box c-red"><i class="fa-solid fa-stopwatch-20"></i></div>
+            <span>SLA Performance</span>
+        </a>
+        <a href="{{ url_for('assets') }}" class="nav-item ajax-link">
+            <div class="icon-box c-yellow"><i class="fa-solid fa-boxes-stacked"></i></div>
+            <span>Asset Inventory</span>
+        </a>
+        <a href="{{ url_for('manage_departments') }}" class="nav-item ajax-link">
+            <div class="icon-box c-blue"><i class="fa-solid fa-building-user"></i></div>
+            <span>Departments</span>
+        </a>
+        <a href="{{ url_for('slas') }}" class="nav-item ajax-link">
+            <div class="icon-box c-red"><i class="fa-solid fa-stopwatch"></i></div>
+            <span>SLA Policies</span>
+        </a>
+        <a href="{{ url_for('users') }}" class="nav-item ajax-link">
+            <div class="icon-box c-purple"><i class="fa-solid fa-users-gear"></i></div>
+            <span>User Management</span>
+        </a>
+        <a href="{{ url_for('it_staff') }}" class="nav-item ajax-link">
+            <div class="icon-box c-teal"><i class="fa-solid fa-user-tie"></i></div>
+            <span>IT Personnel</span>
+        </a>
+
+        {% if can_see_it_projects %}
+        <div class="section-header">Project Office</div>
+        <a href="{{ url_for('it_projects') }}" class="nav-item ajax-link">
+            <div class="icon-box c-purple"><i class="fa-solid fa-kanban"></i></div>
+            <span>Project Board</span>
+        </a>
+        {% endif %}
+
+        <div class="section-header">System</div>
+
+        <a href="{{ url_for('role_settings') }}" class="nav-item ajax-link">
+            <div class="icon-box c-orange"><i class="fa-solid fa-users-viewfinder"></i></div>
+            <span>Role Permissions</span>
+        </a>
+
+        <a href="{{ url_for('archive') }}" class="nav-item ajax-link">
+            <div class="icon-box" style="background: var(--bento-border); color: var(--text-color);"><i class="fa-solid fa-box-archive"></i></div>
+            <span>Archives</span>
+        </a>
+
+        <a href="{{ url_for('settings') }}" class="nav-item ajax-link">
+            <div class="icon-box" style="background: var(--bento-border); color: var(--text-color);"><i class="fa-solid fa-sliders"></i></div>
+            <span>System Settings</span>
+        </a>
+        {% endif %}
+
+        {% if can_see_ier_hub %}
+            <div class="section-header">Security & Audit</div>
+
+            <a href="{{ url_for('audit') }}" class="nav-item ajax-link">
+                <div class="icon-box c-indigo"><i class="fa-solid fa-fingerprint"></i></div>
+                <span>Audit Trail</span>
+            </a>
+        {% endif %}
+
+        <div style="height: 15px;"></div>
+    </div>
+</div>
+
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="content-wrapper" role="main">
+            <div id="topnav">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="btn btn-bento d-lg-none" id="menu-toggle" aria-label="Toggle navigation menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h5 class="m-0 fw-800 d-none d-sm-block" style="color: var(--text-color);">Workspace</h5>
+
+                    <form action="{{ url_for('search') }}" method="GET" class="search-bento ms-md-4 d-none d-md-flex align-items-center" style="width: 280px; padding: 5px 10px;">
+                        <i class="fa-solid fa-magnifying-glass text-muted ms-2"></i>
+                        <input type="search" name="q" class="form-control form-control-sm border-0 shadow-none" placeholder="Search tickets..." required>
+                    </form>
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <div class="dropdown">
+                        <button class="btn btn-bento position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+                             <i class="fa-regular fa-bell"></i>
+                             <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
+                                 <span class="visually-hidden">New alerts</span>
+                             </span>
+                        </button>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-3 p-2" style="width: 340px; border-radius: 16px; background: var(--bento-bg);">
+                            <li><h6 class="dropdown-header fw-bold" style="color: var(--text-color);">Notifications</h6></li>
+                            <li><a class="dropdown-item rounded-3 d-flex gap-3 py-2 my-1" href="#">
+                                <div class="icon-box c-green" style="font-size: 0.9rem;"><i class="fa-solid fa-ticket"></i></div>
+                                <div>
+                                    <div class="fw-bold small" style="color: var(--text-color);">New reply on #TICK-123</div>
+                                    <div class="small" style="color: var(--text-muted); font-size: 0.75rem;">John Doe replied 5 mins ago</div>
+                                </div>
+                            </a></li>
+                            <li><hr class="dropdown-divider opacity-25"></li>
+                            <li><a class="dropdown-item text-center small fw-bold text-primary rounded-3" href="#">View all alerts</a></li>
+                        </ul>
+                    </div>
+
+                    <button class="btn btn-bento" id="theme-toggle" title="Toggle Theme">
+                        <i class="fa-regular fa-moon"></i>
+                    </button>
+
+                    <div class="d-none d-md-block text-end me-2 border-start ps-3" style="border-color: var(--bento-border) !important;">
+                        <div class="small fw-800 text-uppercase" style="letter-spacing: 0.5px; font-size: 0.7rem; color: var(--text-muted);">{{ session.get('user_role', 'Employee') | title }}</div>
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="btn-logout text-decoration-none d-flex align-items-center">
+                        <i class="fa-solid fa-right-from-bracket me-2"></i><span class="d-none d-sm-block">Logout</span>
+                    </a>
+                </div>
+            </div>
+
+            <div id="dynamic-content" class="fade-in">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} border-0 mb-4 d-flex align-items-center" style="border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03);">
+                                <i class="fa-solid {{ 'fa-circle-check' if category == 'success' else 'fa-triangle-exclamation' }} fa-lg me-3"></i>
+                                <div class="fw-600">{{ message }}</div>
+                                <button type="button" class="btn-close ms-auto shadow-none" data-bs-dismiss="alert" aria-label="Close alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const dynamicContent = document.getElementById('dynamic-content');
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menu-toggle');
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle ? themeToggle.querySelector('i') : null;
+            const body = document.body;
+
+            const setSidebarActive = (path) => {
+                document.querySelectorAll('.ajax-link').forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === path);
+                });
+            };
+            setSidebarActive(window.location.pathname);
+
+            if (menuToggle) {
+                menuToggle.onclick = () => {
+                    const isHidden = sidebar.style.transform === 'translateX(-100%)' || sidebar.style.transform === '';
+                    sidebar.style.transform = isHidden ? 'translateX(0px)' : 'translateX(-100%)';
+                }
+            }
+
+            const setTheme = (theme) => {
+                if (theme === 'dark') {
+                    body.classList.add('dark-mode');
+                    if(themeIcon) themeIcon.classList.replace('fa-moon', 'fa-sun');
+                } else {
+                    body.classList.remove('dark-mode');
+                    if(themeIcon) themeIcon.classList.replace('fa-sun', 'fa-moon');
+                }
+                localStorage.setItem('theme', theme);
+            };
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+                    setTheme(newTheme);
+                });
+            }
+            setTheme(localStorage.getItem('theme') || 'light');
+
+            async function fetchAndRender(url) {
+                if (!dynamicContent) return;
+                try {
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                    body.classList.remove('modal-open');
+                    body.style.overflow = 'auto';
+                    body.style.paddingRight = '0';
+                    dynamicContent.classList.add('is-loading');
+
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error("Network error");
+
+                    const htmlText = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlText, 'text/html');
+                    const newContentHTML = doc.getElementById('dynamic-content').innerHTML;
+                    dynamicContent.innerHTML = newContentHTML;
+
+                    const scripts = dynamicContent.querySelectorAll('script');
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                        newScript.textContent = oldScript.textContent;
+                        oldScript.parentNode.replaceChild(newScript, oldScript);
+                    });
+
+                    dynamicContent.classList.remove('fade-in');
+                    void dynamicContent.offsetWidth;
+                    dynamicContent.classList.add('fade-in');
+
+                } catch (error) {
+                    console.error('AJAX Navigation Error:', error);
+                    window.location.href = url;
+                } finally {
+                    dynamicContent.classList.remove('is-loading');
+                }
+            }
+
+            body.addEventListener('click', (e) => {
+                const link = e.target.closest('.ajax-link');
+                if (!link) return;
+                e.preventDefault();
+                const url = link.getAttribute('href');
+                if (window.location.pathname === url) return;
+                if (window.innerWidth <= 992 && sidebar) {
+                    sidebar.style.transform = 'translateX(-100%)';
+                }
+                window.history.pushState({}, '', url);
+                setSidebarActive(url);
+                fetchAndRender(url);
+            });
+
+            window.addEventListener('popstate', () => {
+                setSidebarActive(window.location.pathname);
+                fetchAndRender(window.location.pathname);
+            });
+
+            document.addEventListener('hidden.bs.modal', function () {
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                body.classList.remove('modal-open');
+                body.style.overflow = 'auto';
+                body.style.paddingRight = '0';
+            });
+
+            if (typeof io !== 'undefined') {
+                const socket = io();
+                socket.on('ticket_updated', function(data) {
+                    if (window.location.pathname === "/dashboard" || window.location.pathname === "/") {
+                        fetchAndRender(window.location.pathname);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

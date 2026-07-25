@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+
+        --action-grad: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Instructions Bar --- */
+    .instruction-bar {
+        background: var(--surface-bento);
+        border: 1px solid var(--border-bento);
+        border-radius: 20px;
+        padding: 18px 25px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .inst-item { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; }
+    .inst-item i { color: var(--primary, #3b82f6); font-size: 0.95rem; }
+
+    /* --- Data Table Bento --- */
+    .data-table-bento {
+        background: var(--surface-bento); border-radius: 28px; border: 1px solid var(--border-bento);
+        box-shadow: var(--card-shadow); overflow: hidden;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+        margin-bottom: 30px;
+    }
+
+    /* ========================================= */
+    /* --- BOOTSTRAP TABLE BACKGROUND FIX --- */
+    /* ========================================= */
+    .table,
+    .table > tbody,
+    .table > tbody > tr,
+    .table > tbody > tr > td,
+    .table > thead > tr > th {
+        background-color: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-striped-bg: transparent !important;
+    }
+
+    /* Table Design */
+    .table thead th {
+        color: var(--text-tertiary); font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 1.5px; padding: 20px 25px; border-bottom: 1px solid var(--border-bento);
+        font-weight: 900; background: rgba(0,0,0,0.02) !important;
+    }
+    .table tbody td { padding: 16px 25px; vertical-align: middle; border-bottom: 1px solid var(--border-bento); color: var(--text-primary); font-size: 0.9rem; }
+    .table tbody tr { transition: background-color 0.25s ease; }
+    .table tbody tr:hover { background-color: var(--row-hover-bg) !important; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* Custom Toggles styling */
+    .form-switch .form-check-input {
+        width: 2.6em; height: 1.4em; cursor: pointer; border-color: var(--border-bento);
+        background-color: var(--input-bg); transition: 0.2s ease-in-out;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2.8' fill='%2394a3b8'/%3e%3c/svg%3e");
+    }
+    .form-switch .form-check-input:checked {
+        background-color: var(--primary, #3b82f6); border-color: var(--primary, #3b82f6);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='2.8' fill='%23fff'/%3e%3c/svg%3e");
+    }
+    .form-switch .form-check-input:focus { box-shadow: none; }
+
+    /* Locked State for Super Admin */
+    .switch-readonly { opacity: 0.4; filter: grayscale(1); cursor: not-allowed !important; }
+
+    /* Action Button V2 */
+    .btn-save-v2 {
+        background: var(--action-grad);
+        color: white !important; border: none; border-radius: 14px;
+        padding: 12px 30px; font-weight: 800; font-size: 0.85rem;
+        display: inline-flex; align-items: center; gap: 10px;
+        transition: all 0.3s ease; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.15);
+        text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .btn-save-v2:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(79, 70, 229, 0.3); }
+
+    /* Icon box layout spacing */
+    .table tbody td .icon-box {
+        display: flex; align-items: center; justify-content: center;
+        background: var(--input-bg); color: var(--primary, #3b82f6);
+        border: 1px solid var(--border-bento);
+    }
+
+    .btn-bento {
+        background: var(--surface-bento); border: 1px solid var(--border-bento);
+        border-radius: 14px; padding: 10px 20px; font-weight: 700;
+        color: var(--text-primary); transition: all 0.2s ease;
+        text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .btn-bento:hover { border-color: var(--primary, #3b82f6); color: var(--primary, #3b82f6); }
+
+    /* ========================================= */
+    /* --- BROWSER DROPDOWN VISIBILITY FIX --- */
+    /* ========================================= */
+    select option {
+        background-color: var(--surface-bento) !important;
+        color: var(--text-primary) !important;
+    }
+</style>
+
+<!-- Header -->
+<div class="mb-4 mt-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">System Security</li>
+            <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">Access Matrix</li>
+        </ol>
+    </nav>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <h2 class="page-title m-0">Role Permissions</h2>
+        <a href="{{ url_for('settings') }}" class="btn btn-bento ajax-link" title="Return to System Settings">
+            <i class="fa-solid fa-arrow-left me-2"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Authority Logic Bar -->
+<div class="instruction-bar shadow-sm">
+    <div class="inst-item"><i class="fa-solid fa-user-lock"></i><span>Immutable Super Admin</span></div>
+    <div class="inst-item"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Instant Component Sync</span></div>
+    <div class="inst-item"><i class="fa-solid fa-shield-halved"></i><span>Module Isolation</span></div>
+</div>
+
+<div class="data-table-bento mb-5">
+    <form method="POST" action="{{ url_for('role_settings') }}">
+        <div class="table-responsive">
+            <table class="table table-borderless align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4" style="min-width: 280px;">System Module / Feature</th>
+                        {% for role in roles %}
+                            <th class="text-center">{{ role | title }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for feature in features %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="icon-box" style="width: 32px; height: 32px; border-radius: 8px;">
+                                    <i class="fa-solid
+                                        {% if 'ticket' in feature.name|lower %}fa-ticket
+                                        {% elif 'analytics' in feature.name|lower %}fa-chart-pie
+                                        {% elif 'user' in feature.name|lower %}fa-users-gear
+                                        {% elif 'asset' in feature.name|lower %}fa-boxes-stacked
+                                        {% elif 'setting' in feature.name|lower %}fa-sliders
+                                        {% else %}fa-layer-group{% endif %} small">
+                                    </i>
+                                </div>
+                                <span class="fw-800" style="color: var(--text-primary);">{{ feature.name }}</span>
+                            </div>
+                        </td>
+
+                        {% for role in roles %}
+                        <td class="text-center">
+                            <div class="form-check form-switch d-flex justify-content-center m-0">
+                                <input class="form-check-input shadow-none {% if role == 'super admin' %}switch-readonly{% endif %}"
+                                       type="checkbox"
+                                       role="switch"
+                                       name="perm_{{ feature.id }}"
+                                       value="{{ role }}"
+                                       {% if role in current_perms.get(feature.id, []) or role == 'super admin' %}checked{% endif %}
+                                       {% if role == 'super admin' %}onclick="return false;"{% endif %}>
+                            </div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer Control Bar -->
+        <div class="p-4 border-top text-end" style="border-color: var(--border-bento) !important; background: rgba(0,0,0,0.01);">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="text-start">
+                    <p class="small fw-bold mb-0" style="color: var(--text-secondary);">
+                        <i class="fa-solid fa-circle-info me-2" style="color: var(--primary, #3b82f6);"></i>
+                        Authorized changes will propagate to sidebar menus upon commit.
+                    </p>
+                </div>
+                <button type="submit" class="btn btn-save-v2">
+                    Commit Changes <i class="fa-solid fa-shield-check ms-1"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    (function() {
+        // V2 Matrix Logic - Handled by Form POST
+    })();
+</script>
+{% endblock %}

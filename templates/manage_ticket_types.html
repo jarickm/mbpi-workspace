@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Unified Data Table --- */
+    .data-table-bento {
+        background: var(--surface-bento);
+        border-radius: 28px;
+        border: 1px solid var(--border-bento);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* ========================================= */
+    /* --- BOOTSTRAP TABLE BACKGROUND FIX --- */
+    /* ========================================= */
+    .table,
+    .table > tbody,
+    .table > tbody > tr,
+    .table > tbody > tr > td,
+    .table > thead > tr > th {
+        background-color: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-striped-bg: transparent !important;
+    }
+
+    /* Table Styling */
+    .table thead th {
+        color: var(--text-tertiary); font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 1px; padding: 18px 25px; border-bottom: 1px solid var(--border-bento); font-weight: 800;
+        background: rgba(0,0,0,0.02) !important;
+    }
+    .table tbody td { padding: 18px 25px; vertical-align: middle; border-bottom: 1px solid var(--border-bento); color: var(--text-primary); font-size: 0.9rem; }
+    .table tbody tr { transition: background-color 0.25s ease; }
+    .table tbody tr:hover { background-color: var(--row-hover-bg) !important; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* Translucent Department Badges */
+    .dept-badge-v2 {
+        background: rgba(99, 102, 241, 0.12); color: #6366f1;
+        font-size: 0.75rem; padding: 6px 14px; border-radius: 100px;
+        font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+        display: inline-block; border: 1px solid rgba(99, 102, 241, 0.15);
+    }
+    body.dark-mode .dept-badge-v2 {
+        background: rgba(129, 140, 248, 0.15); color: #818cf8;
+        border-color: rgba(129, 140, 248, 0.25);
+    }
+
+    /* Action Buttons */
+    .btn-action-icon {
+        width: 34px; height: 34px; border-radius: 10px; display: inline-flex;
+        align-items: center; justify-content: center; font-size: 0.85rem;
+        transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
+        background: var(--input-bg); border: 1px solid var(--border-bento);
+        color: var(--text-secondary); text-decoration: none; padding: 0;
+    }
+    .btn-action-icon:hover { transform: translateY(-1px); }
+    .btn-action-icon.btn-edit:hover { border-color: var(--primary, #3b82f6); color: var(--primary, #3b82f6); }
+    .btn-action-icon.btn-delete:hover { border-color: #ef4444; color: #ef4444; }
+
+    /* --- Modal & Forms UX --- */
+    .modal-content { background: var(--surface-bento); border: 1px solid var(--border-bento); border-radius: 24px; box-shadow: var(--card-shadow-hover); }
+    .modal-header { padding: 24px 30px 10px; }
+    .modal-body { padding: 20px 30px 30px; }
+    .form-label-v2 { font-size: 0.75rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+
+    .form-control-v2 {
+        background: var(--input-bg); border: 1px solid var(--input-border); border-radius: 12px;
+        padding: 12px 16px; color: var(--text-primary); font-weight: 600; width: 100%; transition: all 0.2s;
+    }
+    .form-control-v2:focus { border-color: var(--primary, #3b82f6); outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    .form-control-v2::placeholder { color: var(--text-tertiary); }
+
+    /* Backdrop blur for modal */
+    .modal-backdrop.show { opacity: 0.4; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); background-color: #0f172a; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <h2 class="page-title m-0">Department Ticket Categories</h2>
+    <button class="btn btn-primary fw-bold px-4 rounded-4 shadow-sm d-flex align-items-center gap-2" style="background: var(--primary, #3b82f6); border: none; height: 44px;" data-bs-toggle="modal" data-bs-target="#addTypeModal">
+        <i class="fa-solid fa-plus"></i> New Category
+    </button>
+</div>
+
+<!-- DATA TABLE BENTO -->
+<div class="data-table-bento">
+    <table class="table table-borderless align-middle mb-0">
+        <thead>
+            <tr>
+                <th class="ps-4">Department</th>
+                <th>Ticket Type Name</th>
+                <th class="text-end pe-4">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in ticket_types %}
+            <tr>
+                <td class="ps-4"><span class="dept-badge-v2">{{ t.department_name }}</span></td>
+                <td class="fw-bold" style="color: var(--text-primary);">{{ t.type_name }}</td>
+                <td class="text-end pe-4">
+                    <button class="btn-action-icon btn-edit me-1"
+                            onclick="openEditModal('{{t.id}}', '{{t.department_name}}', '{{t.type_name}}')">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <form action="{{ url_for('manage_ticket_types') }}" method="POST" class="d-inline">
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="id" value="{{ t.id }}">
+                        <button type="submit" class="btn-action-icon btn-delete" onclick="return confirm('Delete this type?')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal fade" id="addTypeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0">
+            <form method="POST">
+                <input type="hidden" name="action" value="add">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="fw-800 mb-0" style="color: var(--text-primary);">Add Ticket Type</h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" style="filter: var(--close-btn-filter);"></button>
+                </div>
+                <div class="modal-body pb-0">
+                    <label class="form-label-v2">Target Department</label>
+                    <select name="department_name" class="form-control-v2 shadow-none mb-4" required>
+                        <option value="" disabled selected>-- Select Dept --</option>
+                        {% for d in depts %}
+                        <option value="{{ d }}">{{ d }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label class="form-label-v2">Type Name</label>
+                    <input type="text" name="type_name" class="form-control-v2 shadow-none" placeholder="e.g. Password Reset" required>
+                </div>
+                <div class="modal-footer border-0 p-4">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold rounded-3 py-2.5" style="background: var(--primary, #3b82f6); border: none;">Save Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal fade" id="editTypeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0">
+            <form method="POST">
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="id" id="edit_id">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="fw-800 mb-0" style="color: var(--text-primary);">Edit Ticket Type</h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" style="filter: var(--close-btn-filter);"></button>
+                </div>
+                <div class="modal-body pb-0">
+                    <label class="form-label-v2">Department</label>
+                    <select name="department_name" id="edit_dept" class="form-control-v2 shadow-none mb-4" required>
+                        {% for d in depts %}
+                        <option value="{{ d }}">{{ d }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label class="form-label-v2">Type Name</label>
+                    <input type="text" name="type_name" id="edit_name" class="form-control-v2 shadow-none" required>
+                </div>
+                <div class="modal-footer border-0 p-4">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold rounded-3 py-2.5" style="background: var(--primary, #3b82f6); border: none;">Update Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // --- BACKDROP FIX: Move modals to body to prevent freezing ---
+        const modals = ['addTypeModal', 'editTypeModal'];
+        modals.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('show.bs.modal', () => {
+                    document.body.appendChild(el);
+                });
+            }
+        });
+
+        // Open Edit Modal Function
+        window.openEditModal = function(id, dept, name) {
+            document.getElementById('edit_id').value = id;
+            document.getElementById('edit_dept').value = dept;
+            document.getElementById('edit_name').value = name;
+
+            const editModalEl = document.getElementById('editTypeModal');
+            const modalInstance = bootstrap.Modal.getOrCreateInstance(editModalEl);
+            modalInstance.show();
+        }
+
+        // Dark Mode check for Close Button filter variables
+        const bodyEl = document.body;
+        const setCloseBtnFilter = () => {
+            if (bodyEl.classList.contains('dark-mode')) {
+                document.documentElement.style.setProperty('--close-btn-filter', 'invert(1) grayscale(100%) brightness(200%)');
+            } else {
+                document.documentElement.style.setProperty('--close-btn-filter', 'none');
+            }
+        };
+        setCloseBtnFilter();
+        const observer = new MutationObserver(setCloseBtnFilter);
+        observer.observe(bodyEl, { attributes: true, attributeFilter: ['class'] });
+    })();
+</script>
+{% endblock %}

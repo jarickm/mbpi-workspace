@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Protocol Bar --- */
+    .protocol-bar {
+        background: var(--surface-bento); border: 1px solid var(--border-bento);
+        border-radius: 20px; padding: 18px 25px; margin-bottom: 25px;
+        display: flex; align-items: center; gap: 30px; flex-wrap: wrap;
+        box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .prot-item { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.8px; }
+    .prot-item i { color: var(--primary, #3b82f6); font-size: 0.95rem; }
+
+    /* --- Bento Cards V2 --- */
+    .settings-bento {
+        background: var(--surface-bento); border-radius: 28px; border: 1px solid var(--border-bento);
+        padding: 35px; height: 100%; box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .danger-bento {
+        background: var(--surface-bento); border: 2px dashed rgba(239, 68, 68, 0.3);
+        border-radius: 28px; padding: 35px; height: 100%; transition: all 0.3s ease;
+        position: relative; overflow: hidden; box-shadow: var(--card-shadow);
+    }
+    .danger-bento::before {
+        content: ''; position: absolute; top: -50px; right: -50px; width: 150px; height: 150px;
+        background: #ef4444; filter: blur(70px); opacity: 0.05; pointer-events: none;
+    }
+    .danger-bento:hover { border-color: #ef4444; }
+
+    /* --- Form V2 Aligned --- */
+    .form-label-v2 { font-size: 0.75rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+
+    .form-control-v2 {
+        background: var(--input-bg); border: 1px solid var(--input-border);
+        border-radius: 14px; padding: 12px 15px; color: var(--text-primary);
+        font-weight: 600; width: 100%; transition: all 0.3s;
+    }
+    .form-control-v2:focus { border-color: var(--primary, #3b82f6); outline: none; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+    .form-control-v2::placeholder { color: var(--text-tertiary); }
+
+    /* Input Addons */
+    .v2-input-group {
+        display: flex; align-items: center; background: var(--input-bg);
+        border: 1px solid var(--input-border); border-radius: 14px; overflow: hidden;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .v2-input-group:focus-within {
+        border-color: #ef4444; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+    }
+    .v2-input-group i { padding: 0 15px; color: #ef4444; }
+    .v2-input-group input { border: none; background: transparent; flex-grow: 1; padding: 12px 15px; color: var(--text-primary); font-weight: 600; outline: none; }
+
+    /* Buttons */
+    .btn-save-v2 {
+        background: var(--primary, #3b82f6); color: white !important; border: none; border-radius: 16px;
+        padding: 14px 28px; font-weight: 800; transition: all 0.2s ease;
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.15); display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-save-v2:hover { transform: translateY(-2px); background: #1d4ed8; }
+
+    .btn-danger-v2 {
+        background: linear-gradient(135deg, #ef4444, #b91c1c); color: white !important; border: none;
+        border-radius: 16px; padding: 16px; font-weight: 800; width: 100%; transition: all 0.2s ease;
+        text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        box-shadow: 0 10px 20px rgba(239, 68, 68, 0.15);
+    }
+    .btn-danger-v2:hover { transform: translateY(-2px); box-shadow: 0 15px 25px rgba(239, 68, 68, 0.35); }
+
+    /* Soft UI Icons Tint */
+    .icon-box.c-purple { background: rgba(168, 85, 247, 0.12); color: #a855f7; display: flex; align-items: center; justify-content: center; }
+    .icon-box.c-red { background: rgba(239, 68, 68, 0.12); color: #ef4444; display: flex; align-items: center; justify-content: center; }
+
+    .tip-box {
+        background: rgba(59, 130, 246, 0.08); border: 1px dashed rgba(59, 130, 246, 0.3);
+        border-radius: 18px; padding: 20px;
+    }
+
+    /* ========================================= */
+    /* --- BROWSER DROPDOWN VISIBILITY FIX --- */
+    /* ========================================= */
+    select option {
+        background-color: var(--surface-bento) !important;
+        color: var(--text-primary) !important;
+    }
+</style>
+
+<!-- Header -->
+<div class="mb-4 mt-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">System Administration</li>
+            <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">Settings</li>
+        </ol>
+    </nav>
+    <h2 class="page-title m-0">Core Configuration</h2>
+</div>
+
+<!-- System Protocol Bar -->
+<div class="protocol-bar shadow-sm">
+    <div class="prot-item"><i class="fa-solid fa-tower-broadcast"></i><span>SMTP Relay</span></div>
+    <div class="prot-item"><i class="fa-solid fa-user-shield"></i><span>Admin Vault</span></div>
+    <div class="prot-item"><i class="fa-solid fa-database"></i><span>Data Persistence</span></div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- NOTIFICATION ENGINE -->
+    <div class="col-lg-7">
+        <div class="settings-bento shadow-sm">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="icon-box c-purple" style="width: 48px; height: 48px; border-radius: 14px;">
+                    <i class="fa-solid fa-paper-plane fs-5"></i>
+                </div>
+                <div>
+                    <h5 class="fw-800 m-0" style="color: var(--text-primary);">Notification Engine</h5>
+                    <p class="small fw-bold mb-0" style="color: var(--text-secondary);">SMTP relay and alert orchestration</p>
+                </div>
+            </div>
+
+            <form method="POST">
+                <input type="hidden" name="action" value="save_smtp">
+
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label-v2">SMTP Gateway Host</label>
+                        <input type="text" name="smtp_server" value="{{ st.get('smtp_server', '') }}" class="form-control-v2 shadow-none" placeholder="e.g. smtp.office365.com">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label-v2">Port</label>
+                        <input type="text" name="smtp_port" value="{{ st.get('smtp_port', '') }}" class="form-control-v2 shadow-none" placeholder="587">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-v2">System Sender Email</label>
+                        <input type="email" name="sender_email" value="{{ st.get('sender_email', '') }}" class="form-control-v2 shadow-none" placeholder="helpdesk@cci.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-v2">Encrypted App Password</label>
+                        <input type="password" name="sender_password" value="{{ st.get('sender_password', '') }}" class="form-control-v2 shadow-none" placeholder="••••••••••••">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label-v2">Master Administrator Email</label>
+                        <input type="email" name="admin_email" value="{{ st.get('admin_email', '') }}" class="form-control-v2 shadow-none" placeholder="head.it@cci.com">
+                    </div>
+                </div>
+
+                <div class="mt-5 pt-4 border-top" style="border-color: var(--border-bento) !important;">
+                    <button type="submit" class="btn btn-save-v2">
+                        <i class="fa-solid fa-cloud-arrow-up me-2"></i> Commit Configuration
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DANGER ZONE -->
+    <div class="col-lg-5">
+        <div class="danger-bento shadow-sm">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="icon-box c-red" style="width: 48px; height: 48px; border-radius: 14px;">
+                    <i class="fa-solid fa-triangle-exclamation fs-5"></i>
+                </div>
+                <div>
+                    <h5 class="fw-800 m-0" style="color: #ef4444;">Restricted: Danger Zone</h5>
+                    <p class="small fw-bold mb-0" style="color: var(--text-secondary);">Destructive administrative actions</p>
+                </div>
+            </div>
+
+            <!-- Master Reset Card -->
+            <div class="p-4 rounded-4 border mb-4" style="background: var(--input-bg); border-color: var(--border-bento) !important;">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="fa-solid fa-skull-crossbones text-danger"></i>
+                    <h6 class="fw-800 text-danger m-0" style="font-size: 0.85rem;">DATABASE MASTER RESET</h6>
+                </div>
+                <p class="small fw-600 mb-4" style="color: var(--text-secondary);">This will purge all tickets, technical logs, and IER forms. Users and core settings are preserved.</p>
+
+                <form method="POST" onsubmit="return confirm('CRITICAL: Purge all live data? This action is permanent and irreversible.');">
+                    <input type="hidden" name="action" value="wipe_db">
+
+                    <label class="form-label-v2" style="color: #ef4444;">Authorize Master Password</label>
+                    <div class="v2-input-group mb-4 shadow-sm">
+                        <i class="fa-solid fa-key"></i>
+                        <input type="password" name="password" placeholder="Enter root password" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger-v2">
+                        <i class="fa-solid fa-dumpster-fire me-2"></i> Initialize Wipe Protocol
+                    </button>
+                </form>
+            </div>
+
+            <!-- Recovery Tip -->
+            <div class="tip-box">
+                <div class="d-flex gap-3 align-items-start">
+                    <i class="fa-solid fa-circle-info mt-1" style="color: var(--primary, #3b82f6); font-size: 1.15rem;"></i>
+                    <p class="small m-0 fw-600" style="color: var(--text-secondary);">Mandatory: Please verify that a <strong>Local Backup</strong> has been committed in the Archives module before proceeding with a reset.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // V2 Settings Logic
+    })();
+</script>
+{% endblock %}

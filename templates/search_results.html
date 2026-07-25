@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* --- V2 Search Tokens --- */
+    :root {
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.03);
+    }
+
+    .page-title { font-weight: 800; color: var(--text-color); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* Search Header Area */
+    .search-summary-bar {
+        background: var(--bento-bg);
+        border: 1px solid var(--bento-border);
+        border-radius: 24px;
+        padding: 20px 30px;
+        margin-bottom: 30px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .query-tag {
+        background: var(--bg-blue);
+        color: var(--c-blue);
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-weight: 800;
+        font-family: monospace;
+    }
+
+    /* Result Card V2 */
+    .search-result-card {
+        background: var(--bento-bg);
+        border-radius: 24px;
+        border: 1px solid var(--bento-border);
+        padding: 24px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        text-decoration: none !important;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+    }
+
+    .search-result-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+    }
+
+    /* Type Specific Indicators */
+    .result-icon {
+        width: 40px; height: 40px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 15px; font-size: 1rem;
+    }
+
+    .type-pill-v2 {
+        font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+        letter-spacing: 1px; padding: 4px 10px; border-radius: 6px;
+        margin-bottom: 12px; display: inline-block;
+    }
+
+    /* Result Types Color Mapping */
+    .res-ticket .result-icon { background: var(--bg-blue); color: var(--c-blue); }
+    .res-ticket .type-pill-v2 { background: var(--bg-blue); color: var(--c-blue); }
+
+    .res-kb .result-icon { background: var(--bg-green); color: var(--c-green); }
+    .res-kb .type-pill-v2 { background: var(--bg-green); color: var(--c-green); }
+
+    .res-directory .result-icon { background: var(--bg-orange); color: var(--c-orange); }
+    .res-directory .type-pill-v2 { background: var(--bg-orange); color: var(--c-orange); }
+
+    .res-asset .result-icon { background: var(--bg-indigo); color: var(--c-indigo); }
+    .res-asset .type-pill-v2 { background: var(--bg-indigo); color: var(--c-indigo); }
+
+    .result-meta { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-top: auto; padding-top: 15px; border-top: 1px solid var(--bento-border); }
+</style>
+
+<!-- Header -->
+<div class="mb-4 mt-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item small fw-bold text-muted">Workspace</li>
+            <li class="breadcrumb-item small active fw-bold text-primary">Search Intelligence</li>
+        </ol>
+    </nav>
+    <h2 class="page-title m-0">Cross-Platform Discovery</h2>
+</div>
+
+<!-- Search Summary Bar -->
+<div class="search-summary-bar d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div class="d-flex align-items-center gap-3">
+        <div class="icon-box c-blue" style="background: var(--bg-blue); border-radius: 12px;"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <div>
+            <h5 class="fw-800 text-color m-0">Found {{ results|length }} Matches</h5>
+            <p class="small text-muted fw-bold m-0">Showing results for <span class="query-tag">"{{ query }}"</span></p>
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-bento ajax-link" title="Dashboard">
+            <i class="fa-solid fa-house me-2"></i> Dashboard
+        </a>
+        <a href="{{ request.full_path }}" class="btn btn-primary fw-800 px-4 rounded-3 ajax-link" style="background: var(--primary); border: none;">
+            <i class="fa-solid fa-arrows-rotate me-2"></i> Refresh
+        </a>
+    </div>
+</div>
+
+{% if results %}
+    <div class="row g-4 mb-5">
+    {% for r in results %}
+        <div class="col-md-6 col-lg-4">
+            {% if r.type == 'ticket' %}
+                <a href="{{ url_for('view_ticket', id=r.id) }}" class="search-result-card res-ticket ajax-link">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="result-icon"><i class="fa-solid fa-ticket"></i></div>
+                        <span class="badge bg-light text-muted border rounded-pill small fw-800" style="font-size: 0.6rem;">{{ r.meta }}</span>
+                    </div>
+                    <span class="type-pill-v2">Service Request #{{ r.id }}</span>
+                    <h5 class="fw-800 text-color mb-2">{{ r.title }}</h5>
+                    <p class="small text-muted fw-500 line-clamp-2">{{ r.subtitle }}</p>
+                    <div class="result-meta"><i class="fa-regular fa-clock me-1"></i> Technical Support Case</div>
+                </a>
+
+            {% elif r.type == 'kb' %}
+                <a href="{{ url_for('knowledge_base') }}" class="search-result-card res-kb ajax-link">
+                    <div class="result-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+                    <span class="type-pill-v2">Documentation</span>
+                    <h5 class="fw-800 text-color mb-2">{{ r.title }}</h5>
+                    <p class="small text-muted fw-500 line-clamp-2">{{ r.subtitle }}</p>
+                    <div class="result-meta"><i class="fa-solid fa-graduation-cap me-1"></i> Knowledge Base Resource</div>
+                </a>
+
+            {% elif r.type == 'directory' %}
+                <a href="{{ url_for('directory') }}" class="search-result-card res-directory ajax-link">
+                    <div class="result-icon"><i class="fa-solid fa-address-card"></i></div>
+                    <span class="type-pill-v2">Employee Directory</span>
+                    <h5 class="fw-800 text-color mb-2">{{ r.title }}</h5>
+                    <p class="small text-muted fw-500 line-clamp-2">{{ r.subtitle }} • {{ r.meta }}</p>
+                    <div class="result-meta"><i class="fa-solid fa-building-user me-1"></i> Human Resources Personnel</div>
+                </a>
+
+            {% elif r.type == 'asset' %}
+                <a href="{{ url_for('assets') }}" class="search-result-card res-asset ajax-link">
+                    <div class="result-icon"><i class="fa-solid fa-box-open"></i></div>
+                    <span class="type-pill-v2">Hardware Asset</span>
+                    <h5 class="fw-800 text-color mb-2">{{ r.title }}</h5>
+                    <p class="small text-muted fw-500 line-clamp-2">{{ r.subtitle }} • {{ r.meta }}</p>
+                    <div class="result-meta"><i class="fa-solid fa-microchip me-1"></i> IT Inventory Node</div>
+                </a>
+            {% endif %}
+        </div>
+    {% endfor %}
+    </div>
+{% else %}
+    <!-- V2 Empty State -->
+    <div class="text-center py-5">
+        <div class="icon-box c-red mx-auto mb-4 shadow-sm" style="width: 100px; height: 100px; border-radius: 30px; font-size: 3rem; background: var(--bg-red);">
+            <i class="fa-solid fa-magnifying-glass-minus"></i>
+        </div>
+        <h3 class="fw-800 text-color">No matching entities found</h3>
+        <p class="text-muted fw-500">We couldn't find anything matching <span class="fw-800">"{{ query }}"</span>.<br>Try searching for a Ticket ID, Employee Name, or Asset Serial.</p>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary fw-800 px-5 py-3 rounded-4 mt-4 ajax-link" style="background: var(--primary); border: none;">
+            Return to Discovery Hub
+        </a>
+    </div>
+{% endif %}
+
+{% endblock %}

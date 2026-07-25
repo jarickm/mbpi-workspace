@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Google Font for the Chart Typography -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+
+<style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .page-title { font-weight: 800; background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-card { background: white; border-radius: 24px; padding: 25px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+    .chart-container { background: white; border-radius: 28px; padding: 25px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 15px 35px rgba(0,0,0,0.03); height: 100%; min-height: 350px; }
+
+    .stat-val { font-size: 2.2rem; font-weight: 900; color: #1e293b; line-height: 1; }
+    .stat-label { font-size: 0.75rem; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+
+    canvas { width: 100% !important; max-width: 100%; }
+    .fw-800 { font-weight: 800 !important; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="page-title m-0">Project Insights</h2>
+        <p class="text-muted small fw-bold">Advanced IT Infrastructure Performance Data</p>
+    </div>
+    <a href="{{ url_for('it_projects') }}" class="btn btn-outline-secondary fw-800 rounded-pill px-4 shadow-sm">
+        <i class="fa-solid fa-arrow-left me-2"></i> Back to Board
+    </a>
+</div>
+
+<!-- TOP STATS ROW -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="stat-card d-flex align-items-center gap-4">
+            <div class="bg-primary-subtle text-primary p-3 rounded-4"><i class="fa-solid fa-layer-group fa-2x"></i></div>
+            <div><div class="stat-val">{{ total | default(0) }}</div><div class="stat-label">Total Projects</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card d-flex align-items-center gap-4">
+            <div class="bg-warning-subtle text-warning p-3 rounded-4"><i class="fa-solid fa-bolt fa-2x"></i></div>
+            <div><div class="stat-val">{{ active | default(0) }}</div><div class="stat-label">Currently Active</div></div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card d-flex align-items-center gap-4">
+            <div class="bg-success-subtle text-success p-3 rounded-4"><i class="fa-solid fa-circle-check fa-2x"></i></div>
+            <div><div class="stat-val">{{ completed | default(0) }}</div><div class="stat-label">Completed</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Chart 1: Status Distribution -->
+    <div class="col-lg-4">
+        <div class="chart-container">
+            <h6 class="fw-800 mb-4 text-dark"><i class="fa-solid fa-chart-pie me-2 text-primary"></i>Project Pulse</h6>
+            <div style="position: relative; height: 250px;">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart 2: Staff Workload -->
+    <div class="col-lg-8">
+        <div class="chart-container">
+            <h6 class="fw-800 mb-4 text-dark"><i class="fa-solid fa-chart-bar me-2 text-primary"></i>IT Staff Workload (Lead)</h6>
+            <div style="position: relative; height: 250px;">
+                <canvas id="workloadChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Chart 3: Priority Heatmap -->
+    <div class="col-lg-5">
+        <div class="chart-container">
+            <h6 class="fw-800 mb-4 text-dark"><i class="fa-solid fa-fire me-2 text-danger"></i>Priority Distribution</h6>
+            <div style="position: relative; height: 250px;">
+                <canvas id="priorityChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table: Upcoming Deadlines -->
+    <div class="col-lg-7">
+        <div class="chart-container">
+            <h6 class="fw-800 mb-4 text-dark"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Critical Deadlines</h6>
+            <div class="table-responsive">
+                <table class="table table-borderless align-middle mb-0">
+                    <thead>
+                        <tr class="small text-muted fw-bold border-bottom">
+                            <th>Project Title</th>
+                            <th>Target Date</th>
+                            <th class="text-end">Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in upcoming %}
+                        <tr class="border-bottom">
+                            <td class="fw-bold py-3 text-dark">{{ p.title }}</td>
+                            <td class="small fw-bold text-muted">{{ p.end_date }}</td>
+                            <td class="text-end">
+                                <span class="badge rounded-pill px-3
+                                    {% if p.priority == 'High' %}bg-danger{% elif p.priority == 'Medium' %}bg-warning{% else %}bg-success{% endif %}">
+                                    {{ p.priority }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-center py-4 text-muted fw-bold small">No active deadlines found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    font: { weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
+                    padding: 15
+                }
+            }
+        }
+    };
+
+    // 1. Status Doughnut
+    const statusCtx = document.getElementById('statusChart');
+    if (statusCtx) {
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ status_labels | default([]) | tojson | safe }},
+                datasets: [{
+                    data: {{ status_values | default([]) | tojson | safe }},
+                    backgroundColor: ['#3b82f6', '#f59e0b', '#a855f7', '#22c55e', '#ef4444'],
+                    borderWidth: 0,
+                    hoverOffset: 20
+                }]
+            },
+            options: { ...commonOptions, cutout: '75%' }
+        });
+    }
+
+    // 2. Workload Bar Chart
+    const workloadCtx = document.getElementById('workloadChart');
+    if (workloadCtx) {
+        new Chart(workloadCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ workload_labels | default([]) | tojson | safe }},
+                datasets: [{
+                    label: 'Assigned Projects',
+                    data: {{ workload_values | default([]) | tojson | safe }},
+                    backgroundColor: '#6366f1',
+                    borderRadius: 10,
+                    barThickness: 30
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { weight: 'bold' } } },
+                    x: { ticks: { font: { weight: 'bold' } } }
+                }
+            }
+        });
+    }
+
+    // 3. Priority Polar Area
+    const priorityCtx = document.getElementById('priorityChart');
+    if (priorityCtx) {
+        new Chart(priorityCtx, {
+            type: 'polarArea',
+            data: {
+                labels: {{ prio_labels | default([]) | tojson | safe }},
+                datasets: [{
+                    data: {{ prio_values | default([]) | tojson | safe }},
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(34, 197, 94, 0.7)'
+                    ]
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: { r: { ticks: { display: false } } }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

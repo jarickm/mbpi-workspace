@@ -1,0 +1,539 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* --- Premium UI/UX Tokens (Synced with Dashboard) --- */
+    :root {
+        --grad-primary: linear-gradient(135deg, #0f172a 0%, #1e40af 50%, #3b82f6 100%);
+        --grad-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        --navy-deep: #002e5d;
+        --blue-vibrant: #3b82f6;
+        --primary: #3b82f6;
+        --success: #10b981;
+
+        /* Light Mode Defaults */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --text-tertiary: #64748b;
+
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Overrides for High Readability */
+        --bg-main: #0f172a;
+        --surface-bento: #1e293b;
+        --border-bento: rgba(255, 255, 255, 0.08);
+
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-tertiary: #94a3b8;
+
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        /* Vibrant contrast gradient for dark mode text clipping */
+        --grad-primary: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    }
+
+    body {
+        background-color: var(--bg-main);
+        color: var(--text-primary);
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .page-title {
+        font-weight: 900;
+        background: var(--grad-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -1px;
+    }
+
+    /* --- Status Pill --- */
+    .status-pill {
+        padding: 8px 20px;
+        border-radius: 100px;
+        font-size: 0.75rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        border: 1px solid var(--border-bento);
+        background: var(--surface-bento);
+        color: var(--text-primary);
+        box-shadow: var(--card-shadow);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* --- Icon Halo --- */
+    .icon-halo {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        margin-right: 15px;
+    }
+    .halo-blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .halo-navy { background: rgba(79, 70, 229, 0.15); color: #818cf8; }
+    .halo-green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+    /* --- Bento Info Tiles --- */
+    .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    .bento-tile {
+        padding: 22px;
+        border-radius: 24px;
+        background: var(--surface-bento);
+        border: 1px solid var(--border-bento);
+        box-shadow: var(--card-shadow);
+        position: relative;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .bento-tile:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--card-shadow-hover);
+    }
+    .bento-tile label {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        margin-bottom: 4px;
+        display: block;
+    }
+    .bento-tile span {
+        font-size: 0.95rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        display: block;
+    }
+    .bento-tile i {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        font-size: 1.2rem;
+        opacity: 0.2;
+        color: var(--text-tertiary);
+    }
+
+    /* --- Main Detail Card --- */
+    .detail-card {
+        background: var(--surface-bento);
+        border-radius: 32px;
+        padding: 30px;
+        border: 1px solid var(--border-bento);
+        box-shadow: var(--card-shadow);
+        margin-bottom: 20px;
+    }
+    .section-header { display: flex; align-items: center; margin-bottom: 20px; }
+    .section-header h5 {
+        font-weight: 900;
+        margin: 0;
+        color: var(--text-primary);
+        letter-spacing: -0.5px;
+        font-size: 1.1rem;
+    }
+
+    .block-container-inner {
+        background: var(--input-bg);
+        border: 1px solid var(--border-bento);
+        color: var(--text-primary);
+    }
+
+    /* --- Attachment UI --- */
+    .attachment-box {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border-radius: 18px;
+        background: var(--input-bg);
+        border: 1px solid var(--border-bento);
+        text-decoration: none;
+        color: var(--text-primary);
+        transition: all 0.2s ease;
+    }
+    .attachment-box:hover {
+        transform: translateY(-3px);
+        border-color: var(--primary, #3b82f6);
+        background: var(--surface-bento);
+        box-shadow: var(--card-shadow-hover);
+        color: var(--text-primary);
+    }
+    .file-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    /* --- Communication Log (Chat) --- */
+    .chat-container {
+        background: var(--surface-bento);
+        border-radius: 32px;
+        height: 600px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid var(--border-bento);
+        box-shadow: var(--card-shadow);
+    }
+    .chat-header {
+        background: var(--grad-primary);
+        color: #ffffff;
+        padding: 22px;
+        font-weight: 900;
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+    .chat-messages {
+        flex: 1;
+        padding: 22px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: var(--bg-main);
+    }
+    .msg-bubble {
+        max-width: 85%;
+        padding: 12px 18px;
+        border-radius: 18px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+    .msg-me {
+        background: var(--grad-primary);
+        color: #ffffff;
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+        box-shadow: 0 5px 15px rgba(0, 46, 93, 0.15);
+    }
+    .msg-them {
+        background: var(--surface-bento);
+        border: 1px solid var(--border-bento);
+        color: var(--text-primary);
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+    }
+
+    /* Action Console & Inputs */
+    .console-box {
+        background: var(--input-bg);
+        border: 2px dashed var(--primary, #3b82f6);
+        border-radius: 28px;
+        padding: 25px;
+    }
+
+    .form-control-v2 {
+        background: var(--surface-bento);
+        border: 1px solid var(--border-bento);
+        border-radius: 14px;
+        padding: 12px 15px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        transition: border-color 0.2s ease;
+    }
+    .form-control-v2:focus {
+        border-color: var(--primary, #3b82f6);
+        outline: none;
+    }
+
+    .form-label-v2 {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .alert-custom {
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        background: rgba(59, 130, 246, 0.12);
+        color: #3b82f6;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .chat-footer {
+        background: var(--surface-bento);
+        border-top: 1px solid var(--border-bento);
+    }
+
+    .chat-input {
+        background: var(--input-bg);
+        border: 1px solid var(--border-bento);
+        color: var(--text-primary) !important;
+        border-radius: 14px 0 0 14px;
+        font-weight: 700;
+        padding-left: 20px;
+    }
+</style>
+
+<div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+        <a href="{{ url_for('dashboard') }}" class="text-decoration-none small fw-900 d-block mb-1" style="color: var(--text-secondary);">
+            <i class="fa-solid fa-arrow-left me-1"></i> BACK TO HUB
+        </a>
+        <div class="d-flex align-items-center gap-3">
+            <h1 class="page-title m-0">Case Reference #{{ t.ticket_id }}</h1>
+
+            <!-- NEW: PRINT WORK ORDER BUTTON (Digital Work Order FM00214A) -->
+            <a href="{{ url_for('print_work_order', id=t.ticket_id) }}" target="_blank" class="btn btn-sm rounded-pill px-3 fw-900 border-0 shadow-sm" style="background: var(--surface-bento); color: var(--text-primary); border: 1px solid var(--border-bento) !important;">
+                <i class="fa-solid fa-print me-2 text-primary"></i> PRINT WORK ORDER
+            </a>
+        </div>
+    </div>
+    <div class="status-pill">
+        <i class="fa-solid fa-circle-dot" style="color: var(--primary);"></i> {{ t.status }}
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <!-- BENTO SUMMARY TILES -->
+        <div class="bento-grid">
+            <div class="bento-tile">
+                <i class="fa-solid fa-user-circle"></i>
+                <label>Requester</label>
+                <span>{{ t.employee_name }}</span>
+            </div>
+            <div class="bento-tile">
+                <i class="fa-solid fa-calendar-day"></i>
+                <label>Submitted</label>
+                <span>
+                    {{ t.created_at.strftime('%b %d, %Y') }}<br>
+                    <small style="color: var(--primary); font-weight: 800;">{{ t.created_at.strftime('%I:%M %p') }}</small>
+                </span>
+            </div>
+
+            <!-- NEW: SUPPORT TYPE TILE (MBPI Integration) -->
+            <div class="bento-tile">
+                <i class="fa-solid fa-microchip"></i>
+                <label>Support Type</label>
+                <span>{{ t.support_type or 'Not Specified' }}</span>
+            </div>
+
+            <div class="bento-tile">
+                <i class="fa-solid fa-gauge-high"></i>
+                <label>Priority</label>
+                <span class="{{ 'text-danger' if t.priority in ['High', 'Critical'] }}">{{ t.priority }}</span>
+            </div>
+            <div class="bento-tile">
+                <i class="fa-solid fa-headset"></i>
+                <label>Recipient Handler</label>
+                <span>{{ t.assigned_it or 'Unassigned' }}</span>
+            </div>
+            <div class="bento-tile">
+                <i class="fa-solid fa-desktop"></i>
+                <label>Anydesk ID</label>
+                <span>{{ t.anydesk_id or 'Not Provided' }}</span>
+            </div>
+        </div>
+
+        <!-- RESOLUTION CARD -->
+        {% if t.status == 'Resolved' or t.status == 'Closed' %}
+        <div class="detail-card" style="border-left: 8px solid #10b981;">
+            <div class="section-header">
+                <div class="icon-halo halo-green"><i class="fa-solid fa-check-double"></i></div>
+                <h5>Resolution History & Remarks</h5>
+            </div>
+            <div class="p-4 rounded-4 fw-800 mb-3 block-container-inner">
+                <strong>Action Taken:</strong><br>
+                {{ t.resolution_notes }}
+            </div>
+
+            {% if t.it_remarks %}
+            <div class="p-3 rounded-4 fw-700 mb-3 bg-light text-muted small" style="border: 1px dashed var(--border-bento);">
+                <strong>IT Internal Remarks:</strong> {{ t.it_remarks }}
+            </div>
+            {% endif %}
+
+            {% if t.employee_name == session['username'] or t.employee_name == session.get('full_name') %}
+            <div class="text-center mt-3">
+                <form method="POST" class="d-inline">
+                    <input type="hidden" name="action" value="reopen">
+                    <button type="submit" class="btn btn-warning rounded-pill px-4 fw-900 border-0 shadow-sm" style="color: #0f172a;">
+                        <i class="fa-solid fa-rotate-left me-2"></i> Re-Open Case
+                    </button>
+                </form>
+                {% if t.status == 'Resolved' %}
+                <form method="POST" class="d-inline ms-2">
+                    <input type="hidden" name="action" value="close">
+                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-900 border-0 shadow-sm">
+                        <i class="fa-solid fa-check-circle me-2"></i> Confirm & Close
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- ISSUE DESCRIPTION -->
+        <div class="detail-card">
+            <div class="section-header">
+                <div class="icon-halo halo-navy"><i class="fa-solid fa-align-left"></i></div>
+                <h5>Subject: {{ t.subject }}</h5>
+            </div>
+            <div class="p-4 rounded-4 fw-700 block-container-inner" style="white-space: pre-wrap; line-height: 1.6;">{{ t.description }}</div>
+        </div>
+
+        <!-- ATTACHMENTS -->
+        <div class="detail-card">
+            <div class="section-header">
+                <div class="icon-halo halo-blue"><i class="fa-solid fa-paperclip"></i></div>
+                <h5>Digital Assets</h5>
+            </div>
+            <div class="row g-3">
+                {% if t.reference_form %}
+                <div class="col-md-6">
+                    <a href="{{ url_for('serve_file', table_name='tickets', id=t.ticket_id, column='reference_form') }}" class="attachment-box" target="_blank">
+                        <div class="file-icon bg-primary text-white"><i class="fa-solid fa-file-invoice"></i></div>
+                        <div class="ms-3">
+                            <div class="small fw-800 text-uppercase" style="font-size: 0.6rem; color: var(--text-tertiary);">Reference Form</div>
+                            <div class="fw-800 text-truncate" style="max-width: 150px;">{{ t.reference_form_name or 'View PDF' }}</div>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if t.screenshot_photo %}
+                <div class="col-md-6">
+                    <a href="{{ url_for('serve_file', table_name='tickets', id=t.ticket_id, column='screenshot_photo') }}" class="attachment-box" target="_blank">
+                        <div class="file-icon bg-info text-white"><i class="fa-solid fa-image"></i></div>
+                        <div class="ms-3">
+                            <div class="small fw-800 text-uppercase" style="font-size: 0.6rem; color: var(--text-tertiary);">Screenshot / Photo</div>
+                            <div class="fw-800 text-truncate" style="max-width: 150px;">{{ t.screenshot_photo_name or 'View Image' }}</div>
+                        </div>
+                    </a>
+                </div>
+                {% endif %}
+
+                {% if not t.reference_form and not t.screenshot_photo %}
+                <div class="col-12 py-3 text-center fw-800 small" style="color: var(--text-tertiary);">
+                    <i class="fa-solid fa-ghost me-2"></i> No attachments provided for this case.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- HANDLER FULFILLMENT CONSOLE (Updated for MBPI IT Dept Use Only) -->
+        {% set current_user = session.get('full_name') or session['username'] %}
+        {% set is_handler = (t.assigned_it == current_user or t.assigned_it == session['username']) %}
+        {% set is_admin = session.get('user_role', '').lower() in ['admin', 'super admin'] %}
+
+        {% if (is_handler or is_admin) and t.status not in ['Resolved', 'Rejected', 'Closed'] %}
+        <div class="console-box mt-3">
+            <div class="section-header">
+                <div class="icon-halo bg-dark text-white"><i class="fa-solid fa-terminal"></i></div>
+                <h5 class="m-0" style="color: var(--text-primary);">IT Work Order Management</h5>
+            </div>
+            <form method="POST">
+                {% if t.status in ['New', 'Re-Opened', 'Pending Approval'] %}
+                <div class="alert-custom mb-3">
+                    <i class="fa-solid fa-info-circle me-2"></i> Click below to acknowledge receipt of this Work Order.
+                </div>
+                <button type="submit" name="action" value="take" class="btn btn-primary w-100 py-3 rounded-4 fw-900 border-0 shadow-sm" style="background: var(--grad-primary); color: #ffffff;">
+                    <i class="fa-solid fa-check me-2"></i> ACKNOWLEDGE & START WORK
+                </button>
+
+                {% elif t.status == 'In Progress' %}
+                <!-- Paper Form Fields Integration -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label-v2">Work Priority</label>
+                        <select name="priority" class="form-select form-control-v2">
+                            <option value="Low" {% if t.priority == 'Low' %}selected{% endif %}>Low</option>
+                            <option value="Medium" {% if t.priority == 'Medium' %}selected{% endif %}>Medium</option>
+                            <option value="High" {% if t.priority == 'High' %}selected{% endif %}>High</option>
+                            <option value="Critical" {% if t.priority == 'Critical' %}selected{% endif %}>Critical</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label-v2">Target Date (SLA)</label>
+                        <input type="date" name="target_date" class="form-control-v2 w-100" value="{{ t.target_date }}">
+                    </div>
+                </div>
+
+                <label class="form-label-v2">Resolution / Action Taken</label>
+                <textarea name="resolution_notes" class="form-control-v2 w-100 mb-3" rows="3" placeholder="Explain the fix or action taken..." required></textarea>
+
+                <label class="form-label-v2">Remarks (Internal IT notes)</label>
+                <input type="text" name="it_remarks" class="form-control-v2 w-100 mb-4" placeholder="Additional observations...">
+
+                <button type="submit" name="action" value="resolve" class="btn btn-success w-100 py-3 rounded-4 fw-900 border-0 shadow-sm" style="background: var(--grad-success); color: #ffffff;">
+                    <i class="fa-solid fa-circle-check me-2"></i> MARK AS FULFILLED (RESOLVED)
+                </button>
+                {% endif %}
+            </form>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- RIGHT CHAT COLUMN -->
+    <div class="col-lg-4">
+        <div class="chat-container">
+            <div class="chat-header d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-comment-nodes me-2"></i> COMMS LOG</span>
+                <span class="badge rounded-pill px-3" style="background: var(--text-primary); color: var(--surface-bento);">{{ chats|length }}</span>
+            </div>
+            <div class="chat-messages" id="chatWindow">
+                {% for c in chats %}
+                <div class="msg-bubble {{ 'msg-me' if c.sender == session['username'] else 'msg-them' }}">
+                    <div class="small fw-900 mb-1" style="font-size: 0.6rem; text-transform: uppercase; color: var(--text-secondary);">{{ c.sender }}</div>
+                    <div style="word-break: break-word;">{{ c.message }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="p-3 chat-footer">
+                <form method="POST">
+                    <div class="input-group overflow-hidden rounded-4" style="border: 1px solid var(--border-bento);">
+                        <input type="text" name="message" class="form-control chat-input" placeholder="Add a comment..." required>
+                        <button class="btn btn-primary border-0 px-4" style="background: var(--grad-primary); border-radius: 0 14px 14px 0; color: #ffffff;" type="submit">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        var chat = document.getElementById("chatWindow");
+        if (chat) {
+            chat.scrollTop = chat.scrollHeight;
+        }
+    })();
+</script>
+{% endblock %}

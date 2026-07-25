@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Instructions Bar --- */
+    .instruction-bar {
+        background: var(--surface-bento);
+        border: 1px solid var(--border-bento);
+        border-radius: 20px;
+        padding: 18px 25px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .inst-item { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+    .inst-item i { color: var(--primary, #3b82f6); font-size: 0.95rem; }
+
+    /* --- Data Table Bento --- */
+    .data-table-bento {
+        background: var(--surface-bento); border-radius: 28px; border: 1px solid var(--border-bento);
+        box-shadow: var(--card-shadow); overflow: hidden;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .table-toolbar {
+        padding: 20px 25px; border-bottom: 1px solid var(--border-bento);
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(0,0,0,0.01); flex-wrap: wrap; gap: 15px;
+    }
+
+    .toolbar-filter {
+        background: var(--input-bg); border: 1px solid var(--border-bento);
+        border-radius: 14px; display: flex; align-items: center; padding: 0 15px; width: 320px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .toolbar-filter:focus-within {
+        border-color: var(--primary, #3b82f6);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .toolbar-filter select {
+        border: none; background: transparent; padding: 10px 0;
+        color: var(--text-primary); font-size: 0.85rem; font-weight: 700; width: 100%;
+        outline: none; cursor: pointer;
+    }
+
+    /* ========================================= */
+    /* --- BOOTSTRAP TABLE BACKGROUND FIX --- */
+    /* ========================================= */
+    .table,
+    .table > tbody,
+    .table > tbody > tr,
+    .table > tbody > tr > td,
+    .table > thead > tr > th {
+        background-color: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-striped-bg: transparent !important;
+    }
+
+    /* Table Design */
+    .table thead th {
+        color: var(--text-tertiary); font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 1px; padding: 18px 25px; border-bottom: 1px solid var(--border-bento); font-weight: 800;
+        background: rgba(0,0,0,0.02) !important;
+    }
+    .table tbody td { padding: 18px 25px; vertical-align: middle; border-bottom: 1px solid var(--border-bento); color: var(--text-primary); font-size: 0.95rem; }
+    .table tbody tr { transition: background-color 0.25s ease; }
+    .table tbody tr:hover { background-color: var(--row-hover-bg) !important; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* Audit Elements */
+    .id-tag-v2 {
+        font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 0.82rem;
+        background: var(--input-bg); color: var(--primary, #3b82f6); padding: 5px 12px;
+        border-radius: 8px; border: 1px solid var(--border-bento);
+    }
+
+    .timestamp-v2 {
+        font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 700;
+        color: var(--text-secondary); white-space: nowrap; display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Soft UI Event Badges */
+    .action-pill-v2 {
+        padding: 6px 12px; border-radius: 8px; font-size: 0.7rem;
+        font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+        display: inline-flex; align-items: center; gap: 6px;
+    }
+    .ev-create { background: rgba(16, 185, 129, 0.15); color: #059669; }
+    .ev-update { background: rgba(249, 115, 22, 0.15); color: #ea580c; }
+    .ev-delete { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    .ev-access { background: rgba(99, 102, 241, 0.15); color: #6366f1; }
+    .ev-default { background: var(--input-bg); color: var(--text-secondary); border: 1px solid var(--border-bento); }
+
+    body.dark-mode .ev-create { color: #34d399; }
+    body.dark-mode .ev-update { color: #fb923c; }
+    body.dark-mode .ev-delete { color: #f87171; }
+    body.dark-mode .ev-access { color: #818cf8; }
+
+    .details-bubble-v2 {
+        background: var(--input-bg); border-radius: 10px; padding: 8px 15px;
+        font-size: 0.75rem; color: var(--text-secondary); max-width: 280px;
+        display: block; border: 1px solid var(--border-bento);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .user-agent { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 0.9rem; }
+
+    .avatar-v2 {
+        width: 32px; height: 32px; border-radius: 8px;
+        background: var(--avatar-bg); color: var(--avatar-text);
+        display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800;
+    }
+
+    /* Pagination V2 */
+    .btn-page-v2 {
+        width: 38px; height: 38px; border-radius: 12px; display: inline-flex; align-items: center;
+        justify-content: center; transition: all 0.2s ease; border: 1px solid var(--border-bento);
+        background: var(--surface-bento); color: var(--text-primary); text-decoration: none;
+    }
+    .btn-page-v2:hover:not(.disabled) { border-color: var(--primary, #3b82f6); color: var(--primary, #3b82f6); }
+
+    .btn-bento {
+        background: var(--surface-bento); border: 1px solid var(--border-bento);
+        border-radius: 14px; padding: 10px 20px; font-weight: 700;
+        color: var(--text-primary); transition: all 0.2s ease;
+        text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
+    }
+    .btn-bento:hover { border-color: var(--primary, #3b82f6); color: var(--primary, #3b82f6); }
+
+    /* ========================================= */
+    /* --- BROWSER DROPDOWN VISIBILITY FIX --- */
+    /* ========================================= */
+    select option {
+        background-color: var(--surface-bento) !important;
+        color: var(--text-primary) !important;
+    }
+</style>
+
+<!-- Header -->
+<div class="mb-4 mt-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">System Security</li>
+            <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">Audit Trail</li>
+        </ol>
+    </nav>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <h2 class="page-title m-0">Activity Intelligence</h2>
+
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <!-- FIXED DIRECT EXPORT CSV BUTTON -->
+            <a href="{{ url_for('export_report', dept=current_dept) }}" class="btn btn-bento rounded-4 fw-bold" style="height: 40px; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; padding: 0 20px;">
+                <i class="fa-solid fa-file-csv" style="color: #10b981; font-size: 0.95rem;"></i>
+            </a>
+
+            <!-- STATUS INDICATOR -->
+            <div class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10 px-3 py-2 rounded-pill fw-800 shadow-sm d-flex align-items-center" style="font-size: 0.7rem; background: rgba(16, 185, 129, 0.12) !important; border-color: rgba(16, 185, 129, 0.2) !important; height: 40px; white-space: nowrap;">
+                <i class="fa-solid fa-shield-check me-1"></i> CONTINUOUS LOGGING
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Audit Protocol Bar -->
+<div class="instruction-bar shadow-sm">
+    <div class="inst-item"><i class="fa-solid fa-fingerprint"></i><span>Immutable History</span></div>
+    <div class="inst-item"><i class="fa-solid fa-user-clock"></i><span>User Traceability</span></div>
+    <div class="inst-item"><i class="fa-solid fa-database"></i><span>Integrity Audit</span></div>
+</div>
+
+<div class="data-table-bento mb-5">
+    <!-- Integrated Toolbar -->
+    <div class="table-toolbar">
+        <form method="GET" action="{{ url_for('audit') }}" class="toolbar-filter shadow-sm">
+            <i class="fa-solid fa-filter small text-muted me-2"></i>
+            <select name="dept" onchange="this.form.submit()">
+                <option value="">Filter by Department...</option>
+                {% for d in depts %}
+                <option value="{{ d }}" {% if d == current_dept %}selected{% endif %}>{{ d }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('audit') }}" class="btn-page-v2 ajax-link" title="Reset Logs"><i class="fa-solid fa-arrows-rotate"></i></a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-borderless align-middle mb-0">
+            <thead>
+                <tr>
+                    <th class="ps-4">Logged At</th>
+                    <th>User Agent</th>
+                    <th>Event Action</th>
+                    <th>Object / Ref</th>
+                    <th class="pe-4">Metadata</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for l in logs %}
+                {% set act = l.action | lower %}
+                <tr>
+                    <td class="ps-4">
+                        <div class="timestamp-v2">
+                            <i class="fa-regular fa-clock opacity-50"></i>
+                            {{ l.timestamp.strftime('%Y-%m-%d') }}
+                            <span style="color: var(--primary, #3b82f6);">{{ l.timestamp.strftime('%H:%M:%S') }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="user-agent">
+                            <div class="avatar-v2 shadow-sm">{{ l.username[0] | upper }}</div>
+                            <span style="color: var(--text-primary);">{{ l.username }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="action-pill-v2
+                            {% if 'create' in act or 'add' in act %}ev-create
+                            {% elif 'delete' in act or 'wipe' in act %}ev-delete
+                            {% elif 'update' in act or 'edit' in act %}ev-update
+                            {% elif 'login' in act %}ev-access
+                            {% else %}ev-default{% endif %}">
+                            <i class="fa-solid fa-key-skeleton opacity-50"></i> {{ l.action }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="small fw-800 text-uppercase" style="color: var(--text-tertiary);">{{ l.target_type or 'Node' }}</span>
+                            <span class="id-tag-v2">#{{ l.target_id or '---' }}</span>
+                        </div>
+                    </td>
+                    <td class="pe-4">
+                        <span class="details-bubble-v2" title="{{ l.details }}">
+                            {{ l.details or 'Logged system activity recorded.' }}
+                        </span>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <div class="py-5" style="color: var(--text-tertiary);">
+                            <i class="fa-solid fa-magnifying-glass fa-4x mb-3 opacity-50"></i>
+                            <h5 class="fw-900" style="color: var(--text-primary);">No Intelligence Logged</h5>
+                            <p class="small fw-bold">Records populate here automatically upon system interaction.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- V2 PAGINATION -->
+{% if pagination and pagination.pages > 1 %}
+<div class="d-flex justify-content-center align-items-center gap-2 mt-4 mb-5">
+    <a href="{{ url_for('audit', page=pagination.prev_num, dept=current_dept) }}"
+       class="btn-page-v2 ajax-link {% if not pagination.has_prev %}disabled opacity-25{% endif %}">
+        <i class="fa-solid fa-chevron-left"></i>
+    </a>
+
+    <div class="px-3 py-2 fw-800 small shadow-sm" style="background: var(--surface-bento); border: 1px solid var(--border-bento); border-radius: 12px; color: var(--text-primary);">
+        {{ pagination.page }} <span class="mx-1" style="color: var(--text-tertiary); font-weight: normal;">/</span> {{ pagination.pages }}
+    </div>
+
+    <a href="{{ url_for('audit', page=pagination.next_num, dept=current_dept) }}"
+       class="btn-page-v2 ajax-link {% if not pagination.has_next %}disabled opacity-25{% endif %}">
+        <i class="fa-solid fa-chevron-right"></i>
+    </a>
+</div>
+{% endif %}
+
+<script>
+    (function() {
+        // V2 Audit Trail Logic
+    })();
+</script>
+{% endblock %}

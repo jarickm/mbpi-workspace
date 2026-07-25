@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* ========================================= */
+    /* --- V2 PREMIUM DASHBOARD TOKENS       --- */
+    /* ========================================= */
+    :root {
+        /* Light Mode Variables */
+        --bg-main: #f8fafc;
+        --surface-bento: #ffffff;
+        --border-bento: #e2e8f0;
+
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --text-tertiary: #94a3b8;
+
+        --row-hover-bg: rgba(15, 23, 42, 0.02);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.08);
+
+        --input-bg: #f8fafc;
+        --input-border: #cbd5e1;
+
+        --avatar-bg: #e0e7ff;
+        --avatar-text: #4f46e5;
+    }
+
+    body.dark-mode {
+        /* Dark Mode Variables - Optimized for Depth & Contrast */
+        --bg-main: #0f172a; /* Deep Slate Background */
+        --surface-bento: #1e293b; /* Slightly lighter surface */
+        --border-bento: rgba(255, 255, 255, 0.08); /* Subtle glass border */
+
+        --text-primary: #f8fafc; /* Crisp Off-White */
+        --text-secondary: #cbd5e1; /* Silver */
+        --text-tertiary: #94a3b8; /* Slate Gray */
+
+        --row-hover-bg: rgba(255, 255, 255, 0.03);
+        --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+        --input-bg: #0f172a;
+        --input-border: rgba(255, 255, 255, 0.15);
+
+        --avatar-bg: rgba(79, 70, 229, 0.2);
+        --avatar-text: #818cf8;
+    }
+
+    body { background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease; }
+
+    /* --- Typography & Headers --- */
+    .page-title { font-weight: 800; color: var(--text-primary); font-size: 1.85rem; letter-spacing: -0.5px; }
+
+    /* --- Instructions Bar --- */
+    .instruction-bar {
+        background: var(--surface-bento);
+        border: 1px solid var(--border-bento);
+        border-radius: 20px;
+        padding: 18px 25px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .inst-item { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+    .inst-item i { color: var(--primary, #3b82f6); font-size: 0.95rem; }
+
+    /* --- Data Table Bento --- */
+    .data-table-bento {
+        background: var(--surface-bento); border-radius: 28px; padding: 0;
+        border: 1px solid var(--border-bento); box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .table-toolbar {
+        padding: 20px 25px;
+        border-bottom: 1px solid var(--border-bento);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .toolbar-search {
+        background: var(--input-bg);
+        border: 1px solid var(--border-bento);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        padding: 0 15px;
+        width: 280px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .toolbar-search:focus-within {
+        border-color: var(--primary, #3b82f6);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .toolbar-search input {
+        border: none; background: transparent; padding: 10px 0;
+        color: var(--text-primary); font-size: 0.85rem; font-weight: 600; width: 100%;
+        outline: none;
+    }
+    .toolbar-search input::placeholder { color: var(--text-tertiary); }
+
+    /* ========================================= */
+    /* --- BOOTSTRAP TABLE BACKGROUND FIX --- */
+    /* ========================================= */
+    .table,
+    .table > tbody,
+    .table > tbody > tr,
+    .table > tbody > tr > td,
+    .table > thead > tr > th {
+        background-color: transparent !important;
+        --bs-table-bg: transparent !important;
+        --bs-table-accent-bg: transparent !important;
+        --bs-table-striped-bg: transparent !important;
+    }
+
+    /* Table Design */
+    .table thead th {
+        color: var(--text-tertiary); font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 1px; padding: 18px 25px; border-bottom: 1px solid var(--border-bento); font-weight: 800;
+        background: rgba(0,0,0,0.02) !important;
+    }
+    .table tbody td { padding: 18px 25px; vertical-align: middle; border-bottom: 1px solid var(--border-bento); color: var(--text-primary); font-size: 1rem; }
+    .table tbody tr { transition: background-color 0.25s ease; }
+    .table tbody tr:hover { background-color: var(--row-hover-bg) !important; }
+    .table tbody tr:last-child td { border-bottom: none; }
+
+    /* Department UI Elements */
+    .id-tag-v2 {
+        font-family: 'JetBrains Mono', monospace; font-weight: 800; font-size: 0.82rem;
+        background: var(--input-bg); color: var(--primary, #3b82f6); padding: 5px 12px;
+        border-radius: 8px; border: 1px solid var(--border-bento);
+    }
+
+    .dept-icon-v2 {
+        width: 40px; height: 40px;
+        background: linear-gradient(135deg, var(--primary, #3b82f6) 0%, #4f46e5 100%);
+        color: white; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1rem; box-shadow: 0 5px 15px rgba(59, 130, 246, 0.15);
+    }
+
+    /* Sidebar Form */
+    .sticky-sidebar { position: sticky; top: 20px; }
+
+    .form-bento {
+        background: var(--surface-bento); border-radius: 28px; border: 1px solid var(--border-bento);
+        padding: 30px; box-shadow: var(--card-shadow);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .form-label-v2 { font-size: 0.75rem; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: block; }
+
+    .form-control-v2 {
+        background: var(--input-bg); border: 1px solid var(--border-bento);
+        border-radius: 14px; padding: 14px 15px; color: var(--text-primary);
+        font-weight: 600; width: 100%; transition: all 0.3s; font-size: 0.95rem;
+    }
+    .form-control-v2:focus { border-color: var(--primary, #3b82f6); outline: none; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+    .form-control-v2::placeholder { color: var(--text-tertiary); }
+
+    .btn-add-v2 {
+        background: var(--primary, #3b82f6); color: white !important; border: none; border-radius: 16px;
+        padding: 16px; font-weight: 800; width: 100%; transition: all 0.2s ease;
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.15); display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-add-v2:hover { transform: translateY(-2px); background: #1d4ed8; }
+
+    .tip-box {
+        background: rgba(59, 130, 246, 0.08); border: 1px dashed rgba(59, 130, 246, 0.3);
+        border-radius: 18px; padding: 20px; margin-top: 25px;
+    }
+
+    .icon-box.c-indigo {
+        background: rgba(99, 102, 241, 0.12);
+        color: #6366f1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<!-- Header -->
+<div class="mb-4 mt-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-1">
+            <li class="breadcrumb-item small fw-bold" style="color: var(--text-tertiary);">System Configuration</li>
+            <li class="breadcrumb-item small active fw-bold" style="color: var(--primary, #3b82f6);">Departments</li>
+        </ol>
+    </nav>
+    <h2 class="page-title m-0">Organization Blueprint</h2>
+</div>
+
+<!-- Process Instructions -->
+<div class="instruction-bar shadow-sm">
+    <div class="inst-item">
+        <i class="fa-solid fa-sitemap"></i>
+        <span>Define Organizational Units</span>
+    </div>
+    <div class="inst-item">
+        <i class="fa-solid fa-user-tag"></i>
+        <span>Sync to Employee Registration</span>
+    </div>
+    <div class="inst-item">
+        <i class="fa-solid fa-route"></i>
+        <span>Route Universal Ticketing</span>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- DEPARTMENT LIST -->
+    <div class="col-lg-7">
+        <div class="data-table-bento">
+            <div class="table-toolbar" style="border-color: var(--border-bento) !important;">
+                <div class="toolbar-search">
+                    <i class="fa-solid fa-magnifying-glass" style="color: var(--text-tertiary);"></i>
+                    <input type="text" id="deptSearch" placeholder="Search departments..." onkeyup="filterDepts()">
+                </div>
+                <div class="small fw-800" style="color: var(--text-secondary);">{{ depts|length }} Units Active</div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-borderless align-middle mb-0" id="deptTable">
+                    <thead>
+                        <tr>
+                            <th class="ps-4" style="width: 120px;">Ref ID</th>
+                            <th>Department Name</th>
+                            <th class="text-end pe-4">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in depts %}
+                        <tr>
+                            <td class="ps-4"><span class="id-tag-v2">#{{ d.id }}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="dept-icon-v2"><i class="fa-solid fa-building-user"></i></div>
+                                    <div class="fw-800" style="font-size: 1.05rem; color: var(--text-primary);">{{ d.name }}</div>
+                                </div>
+                            </td>
+                            <td class="text-end pe-4">
+                                <form method="POST" onsubmit="return confirm('Remove this organizational unit? This may affect assigned user sessions.');" class="d-inline">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="id" value="{{ d.id }}">
+                                    <button type="submit" class="btn btn-link text-danger p-0 border-0 opacity-50 hover-opacity-100"><i class="fa-solid fa-trash-can"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center py-5">
+                                <div class="py-4" style="color: var(--text-tertiary);">
+                                    <i class="fa-solid fa-building-circle-exclamation fa-4x mb-3 opacity-50"></i>
+                                    <h5 class="fw-800" style="color: var(--text-primary);">No Departments Found</h5>
+                                    <p class="small fw-bold">Register a new unit using the sidebar.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD DEPARTMENT SIDEBAR -->
+    <div class="col-lg-5">
+        <div class="sticky-sidebar">
+            <div class="form-bento">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <div class="icon-box c-indigo" style="width: 48px; height: 48px; border-radius: 14px; font-size: 1.2rem;">
+                        <i class="fa-solid fa-folder-plus"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-800 m-0" style="color: var(--text-primary);">Register Dept</h5>
+                        <p class="small fw-bold mb-0" style="color: var(--text-secondary);">Expand infrastructure</p>
+                    </div>
+                </div>
+
+                <form method="POST">
+                    <input type="hidden" name="action" value="add">
+
+                    <div class="mb-4">
+                        <label class="form-label-v2">Official Department Name *</label>
+                        <input type="text" name="name" class="form-control-v2 shadow-none" placeholder="e.g. Logistics & Supply Chain" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-add-v2">
+                        <i class="fa-solid fa-plus-circle me-2"></i> Deploy New Department
+                    </button>
+                </form>
+
+                <!-- Process Tip -->
+                <div class="tip-box">
+                    <div class="d-flex gap-3">
+                        <i class="fa-solid fa-circle-info mt-1" style="color: var(--primary, #3b82f6); font-size: 1.15rem;"></i>
+                        <div>
+                            <h6 class="fw-800 mb-1" style="color: var(--primary, #3b82f6); font-size: 0.85rem;">V2 Integration Note:</h6>
+                            <p class="small mb-0 fw-600" style="font-size: 0.75rem; color: var(--text-secondary);">Departments added here are immediately synced with the <strong>Universal Service Portal</strong> and <strong>Employee Directory</strong> modules.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Real-time Department Filtering
+    function filterDepts() {
+        let input = document.getElementById('deptSearch');
+        let filter = input.value.toUpperCase();
+        let table = document.getElementById('deptTable');
+        let tr = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < tr.length; i++) {
+            let td = tr[i].getElementsByTagName('td')[1];
+            if (td) {
+                let textValue = td.textContent || td.innerText;
+                tr[i].style.display = textValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+            }
+        }
+    }
+</script>
+{% endblock %}
