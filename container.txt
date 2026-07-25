@@ -1,0 +1,72 @@
+@app.route('/users', methods=['GET', 'POST'])
+@admin_required
+def users():
+    if request.method == 'POST':
+        action = request.form.get('action')
+        try:
+            with engine.begin() as c:
+                if action == 'add':
+                    hp = bcrypt.hashpw(request.form['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                    c.execute(text("INSERT INTO users (username, password_hash, role) VALUES (:u, :p, :r)"),
+                              {"u": request.form['username'], "p": hp, "r": request.form['role']})
+                    log_audit(session['username'], "CREATE_USER", "User", details=request.form['username'])
+                    flash("User created successfully.", "success")
+
+                # --- NEW MODIFY LOGIC ---
+                elif action == 'edit':
+                    uid = request.form.get('id')
+                    new_user = request.form.get('username')
+                    new_role = request.form.get('role')
+                    new_pass = request.form.get('password')
+
+                    # Update Basic Info
+                    c.execute(text("UPDATE users SET username=:u, role=:r WHERE user_id=:id"),
+                              {"u": new_user, "r": new_role, "id": uid})
+
+                    # Update Password only if provided
+                    if new_pass and new_pass.strip() != "":
+                        hp = bcrypt.hashpw(new_pass.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                        c.execute(text("UPDATE users SET password_hash=:p WHERE user_id=:id"),
+                                  {"p": hp, "id": uid})
+
+                    log_audit(session['username'], "MODIFY_USER", "User", target_id=uid, details=f"Updated {new_user}")
+                    flash(f"User {new_user} updated successfully.", "success")
+
+                elif action == 'delete' and int(request.form['id']) != session['user_id']:
+                    c.execute(text("DELETE FROM users WHERE user_id=:id"), {"id": request.form['id']})
+                    log_audit(session['username'], "DELETE_USER", "User", target_id=request.form['id'])
+                    flash("User deleted.", "success")
+
+                                elif action == 'import':
+                    file = request.files.get('excel_file')
+                    if file and file.filename.endswith('.xlsx'):
+                        wb = openpyxl.load_workbook(file)
+                        sheet = wb.active
+                        count = 0
+                        # Assuming Row 1 is Headers: Username | Password | Role
+                        for row in sheet.iter_rows(min_row=2, values_only=True):
+                            if row[0] and row[1]:  # Username and Password are required
+                                hp = bcrypt.hashpw(str(row[1]).encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                                role = row[2] if len(row) > 2 and row[2] else 'User'
+
+                                # Use ON CONFLICT DO NOTHING to skip users that already exist
+                                c.execute(text("""INSERT INTO users (username, password_hash, role)
+                                                  VALUES (:u, :p, :r) ON CONFLICT (username) DO NOTHING"""),
+                                          {"u": row[0], "p": hp, "r": role})
+                                count += 1
+                        log_audit(session['username'], "IMPORT_USERS", "User", details=f"Imported {count} users")
+                        flash(f"Success! Processed {count} users from Excel.", "success")
+                    else:
+                        flash("Please upload a valid .xlsx file.", "danger")
+        except Exception as e:
+            flash(f"Database/Import Error: {e}", "danger")
+
+        return redirect(url_for('users'))
+
+        except Exception as e:
+            flash(f"Error: {e}", "danger")
+        return redirect(url_for('users'))
+
+    with engine.connect() as c:
+        user_list = c.execute(text("SELECT user_id, username, role FROM users ORDER BY user_id")).fetchall()
+    return render_template('users.html', user_list=user_list)
